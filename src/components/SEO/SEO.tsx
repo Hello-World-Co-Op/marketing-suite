@@ -50,6 +50,7 @@ export function SEO({
       {/* Primary Meta Tags */}
       <title>{title}</title>
       <meta name="description" content={description} />
+      <meta name="robots" content="index, follow" />
 
       {/* Open Graph / Facebook */}
       <meta property="og:type" content={type} />
@@ -67,6 +68,11 @@ export function SEO({
 
       {/* Canonical URL */}
       {url && <link rel="canonical" href={url} />}
+
+      {/* Future enhancement: Add structured data (JSON-LD) here for rich search results
+       * Example: Organization schema, WebSite schema, BreadcrumbList
+       * See: https://schema.org/
+       */}
     </Helmet>
   );
 }

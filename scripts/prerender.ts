@@ -61,6 +61,14 @@ async function prerender() {
     console.log(`Pre-rendering: ${route}`);
     const { html, helmet } = render(route);
 
+    // Validate that helmet data was collected (fail build if SEO tags missing)
+    if (!helmet?.title || !helmet?.meta) {
+      throw new Error(
+        `Pre-render failed for ${route}: helmet data not collected. ` +
+        'Ensure HelmetProvider wraps the app in entry-prerender.tsx.'
+      );
+    }
+
     // Inject helmet meta tags into <head> (before closing </head>)
     let page = template;
     if (helmet) {

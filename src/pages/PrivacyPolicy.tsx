@@ -326,7 +326,7 @@ export default function PrivacyPolicy() {
       {/* Footer */}
       <footer className="bg-slate-100 border-t border-slate-200 mt-16">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6 text-center text-sm text-slate-600">
-          <p>&copy; {new Date().getFullYear()} Hello World Co-Op DAO. All rights reserved.</p>
+          <p>&copy; <span suppressHydrationWarning>{new Date().getFullYear()}</span> Hello World Co-Op DAO. All rights reserved.</p>
         </div>
       </footer>
     </div>

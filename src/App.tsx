@@ -1,19 +1,16 @@
-import { Component, Suspense, lazy, type ReactNode, type ErrorInfo } from 'react';
+import { Component, type ReactNode, type ErrorInfo } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
 
-// Route-based code splitting - each page loads on demand
-const LaunchPage = lazy(() => import('@/pages/LaunchPage'));
-const PrivacyPolicy = lazy(() => import('@/pages/PrivacyPolicy'));
+// Pre-rendered routes are imported directly (not lazy) to avoid hydration
+// mismatches between SSR (synchronous) and client (async with Suspense).
+// This ensures SEO-critical pages hydrate instantly without a loading fallback.
+import LaunchPage from '@/pages/LaunchPage';
+import PrivacyPolicy from '@/pages/PrivacyPolicy';
 
-// Loading fallback for lazy-loaded routes
-function PageLoader() {
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-900">
-      <div className="animate-pulse text-white text-lg">Loading...</div>
-    </div>
-  );
-}
+// Future non-SEO routes can use lazy loading with Suspense:
+// import { Suspense, lazy } from 'react';
+// const FuturePage = lazy(() => import('@/pages/FuturePage'));
 
 // ErrorBoundary component
 class ErrorBoundary extends Component<{ children: ReactNode }, { hasError: boolean }> {
@@ -48,12 +45,10 @@ function App() {
     <HelmetProvider>
       <ErrorBoundary>
         <BrowserRouter>
-          <Suspense fallback={<PageLoader />}>
-            <Routes>
-              <Route path="/" element={<LaunchPage />} />
-              <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-            </Routes>
-          </Suspense>
+          <Routes>
+            <Route path="/" element={<LaunchPage />} />
+            <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+          </Routes>
         </BrowserRouter>
       </ErrorBoundary>
     </HelmetProvider>

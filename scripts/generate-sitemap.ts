@@ -26,6 +26,9 @@ const routes: SitemapRoute[] = [
   { path: '/privacy-policy', changefreq: 'monthly', priority: 0.5 },
 ];
 
+// Note: lastmod is set to build date (not actual file modification date).
+// This is acceptable for static sites where every build may update assets.
+// For more accurate lastmod, consider querying git commit dates per file.
 const today = new Date().toISOString().split('T')[0];
 
 const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
