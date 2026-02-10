@@ -1,0 +1,75 @@
+{
+  "hero": {
+    "scroll_hint": "Scroll to learn more"
+  },
+  "intro": {
+    "opening": "You. Yes, you. If you had the power to create a better world, what would you do?",
+    "blueprint": "That's the very question we at the Hello World Co-Op asked ourselves at the beginning of 2024. The result? A meticulously designed <strong>blueprint to help humanity collectively build and heal its world.</strong>",
+    "mission_intro": "Sound ambitious? Good. The core of our mission is to help communities around the world come together to take control of our future. We aim to:",
+    "goals": {
+      "democratize": "Democratize access to owning land, infrastructure, and other assets",
+      "protect": "Protect fundamental human rights like access to food, housing, and education",
+      "solutions": "Create lasting, sustainable solutions to the world's biggest problems (we're looking at you, climate change)"
+    },
+    "cta_prompt": "We want you to be a part of the change you want to see. Ready to come on board?",
+    "cta_button": "Join Our Waitlist"
+  },
+  "video": {
+    "heading": "A Tale of Transformation",
+    "coming_soon": "Video Coming Soon",
+    "description": "Watch our journey of transformation and see how we're building a better world together",
+    "caption": "Discover the story of how Hello World Co-op came to be and the vision guiding our mission."
+  },
+  "ecosystem": {
+    "heading": "That all sounds great, but what exactly is the plan here?",
+    "intro_1": "We get it. Changing the world sounds nice in theory, but what we really need is a plan. Don't worry, we've come prepared.",
+    "intro_2": "The Hello World Co-Op ecosystem consists of a few fundamental parts. These parts work together to help humanity <strong>build a regenerative society</strong> – a place where we don't simply \"sustain\" life, but we also replenish the Earth and its people, creating systems that keep getting better over time. These fundamental parts are:",
+    "parts": {
+      "otter_camp": "<strong>Otter Camp</strong> – a gamified crowdfunding platform",
+      "marketplace": "<strong>The Co-Op Marketplace</strong> – an ethical, decentralized commerce platform",
+      "rabbit_whole": "<strong>Rabbit Whole</strong> – a social and educational hub",
+      "think_tank": "<strong>The Think Tank App</strong> – an AI powered proposal outlining assistant",
+      "campuses": "<strong>Regenerative Campuses</strong> – real world hubs for living and working"
+    },
+    "conclusion": "Let's take a look at each of these up close."
+  },
+  "otter_camp": {
+    "heading": "Otter Camp: The Game that Rebuilds Worlds",
+    "intro": "We call Otter Camp the game that rebuilds worlds because that's exactly what it does. We take real world project proposals that have been approved by the Co-op – think clean energy grids, sustainable housing, local food systems – and turn them into fun, interactive quests inside a game.",
+    "impact": "Every action you take will directly fund real projects that are healing our planet.",
+    "token_intro": "We've also built a powerful economic incentive into our world: the <strong>Donation Otter Money (D.O.M) token</strong>. This token operates on a deflationary economic model, meaning its total supply goes down over time. That's made possible through a burn mechanism that permanently removes tokens from circulation, making D.O.M. more rare and valuable.",
+    "token_value": "In short, D.O.M. turns every player's action into real-world impact.",
+    "cta_button": "Start Your Adventure"
+  },
+  "marketplace": {
+    "heading": "The Co-Op Marketplace: Your Hub for Sustainable Shopping",
+    "intro": "Whether you're shopping with D.O.M. or any other stable currency, the Co-Op Marketplace is your solution. Only ethical and sustainable vendors that have been vetted by the Co-op are allowed to sell on this decentralized platform, meaning you can shop with confidence that your commerce is positively impacting the planet.",
+    "standards": "The best part? Ethical vendors aren't just a pinky promise. Our standards are upheld automatically by smart contracts. That means that in the Co-Op Marketplace, doing good isn't just a choice—<strong>it's written into the code.</strong>"
+  },
+  "rabbit_whole": {
+    "heading": "Rabbit Whole: Our \"Learn to Earn\" Educational and Social Platform",
+    "intro": "Rabbit Whole is our space for learning and connection – because education is our way forward. Here you can develop amazing new skills like permaculture design or the basics of blockchain to help build our regenerative future.",
+    "rewards": "You'll get rewarded for your progress with badges and D.O.M. tokens with our <strong>\"learn to earn\" model</strong>.",
+    "offline": "Plus, we're passionate about making sure no one gets left behind. That's why we created our <strong>Offline Ambassador Program</strong>. We use tiny, inexpensive raspberry pi servers that help bridge the digital divide and bring access to communities with limited or no internet access."
+  },
+  "think_tank": {
+    "heading": "The Think Tank App: Your Proposal Writing Assistant",
+    "intro": "Wondering where all these incredible community project ideas are coming from? The answer: you, of course! With the Think Tank App, any user – no matter their background – can effectively take a spark of an idea and turn it into a well thought out project proposal with this AI companion tool.",
+    "question": "Got an idea for a change you'd like to see in your local community?",
+    "cta_button": "Get Access to Think Tank"
+  },
+  "campuses": {
+    "heading": "Regenerative Campuses: Where Digital Components Come to Life",
+    "intro": "Once project ideas are approved by the Co-op through a member voting process and funded through game play in Otter Camp, they can come to life on our regenerative campuses. These are real world places where members can live and work together to build solutions to modern problems.",
+    "impact": "Sensors on these campuses stream real-time, transparent data on positive impact like carbon sequestered straight to the blockchain for the whole world to verify. In this way, every action in Otter Camp directly contributes to <strong>measurable, verifiable real-world change</strong>.",
+    "cta_button": "Be Part of the Movement"
+  },
+  "closing": {
+    "heading": "Ready to Join Our World?",
+    "intro": "The world doesn't belong to one or a few people – it belongs to all of us. It's time we start acting like it. As a Hello-World Co-op Member, you will gain access to all of these tools and resources so you can start making a difference in your own life and the lives of others from day one.",
+    "call_to_action": "<strong>Together, we can take control of our future.</strong>",
+    "welcome": "Whoever you are, we have a place for you.",
+    "cta_button": "Join Our Waitlist Now",
+    "footer": "🌍 Building a Regenerative Future, Together"
+  }
+}

@@ -1,0 +1,52 @@
+{
+  "heading": "Junte-se à Lista de Interesse",
+  "waitlist_heading": "Junte-se à Nossa Lista de Espera",
+  "fields": {
+    "first_name": {
+      "label": "Primeiro Nome",
+      "placeholder": "João",
+      "required": "O primeiro nome é obrigatório",
+      "min_length": "O primeiro nome deve ter pelo menos 2 caracteres"
+    },
+    "last_name": {
+      "label": "Sobrenome",
+      "placeholder": "Silva",
+      "required": "O sobrenome é obrigatório",
+      "min_length": "O sobrenome deve ter pelo menos 2 caracteres"
+    },
+    "email": {
+      "label": "Endereço de Email",
+      "placeholder": "joao.silva@exemplo.com",
+      "required": "O email é obrigatório",
+      "invalid": "Por favor insira um endereço de email válido",
+      "help": "Enviaremos atualizações sobre a Hello World Cooperativa"
+    },
+    "country": {
+      "label": "País",
+      "placeholder": "Selecione um país",
+      "optional": "(opcional)"
+    },
+    "state": {
+      "label": "Estado/Província",
+      "placeholder": "Selecione um estado/província"
+    },
+    "city": {
+      "label": "Cidade",
+      "placeholder": "São Paulo",
+      "optional": "(opcional)"
+    },
+    "postal_code": {
+      "label": "Código Postal",
+      "placeholder": "01310-100",
+      "optional": "(opcional)",
+      "invalid": "Por favor insira um código postal válido"
+    }
+  },
+  "submit": "Juntar-se à Lista de Interesse",
+  "submitting": "Enviando...",
+  "messages": {
+    "success": "Obrigado {{name}}! Entraremos em contato em {{email}}",
+    "error": "Ocorreu um erro. Por favor tente novamente mais tarde.",
+    "required_fields": "Por favor preencha todos os campos obrigatórios"
+  }
+}

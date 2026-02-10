@@ -1,0 +1,52 @@
+{
+  "heading": "Join the Interest List",
+  "waitlist_heading": "Join Our Waitlist",
+  "fields": {
+    "first_name": {
+      "label": "First Name",
+      "placeholder": "John",
+      "required": "First name is required",
+      "min_length": "First name must be at least 2 characters"
+    },
+    "last_name": {
+      "label": "Last Name",
+      "placeholder": "Doe",
+      "required": "Last name is required",
+      "min_length": "Last name must be at least 2 characters"
+    },
+    "email": {
+      "label": "Email Address",
+      "placeholder": "john.doe@example.com",
+      "required": "Email is required",
+      "invalid": "Please enter a valid email address",
+      "help": "We'll send you updates about Hello World Co-op"
+    },
+    "country": {
+      "label": "Country",
+      "placeholder": "Select a country",
+      "optional": "(optional)"
+    },
+    "state": {
+      "label": "State/Province",
+      "placeholder": "Select a state/province"
+    },
+    "city": {
+      "label": "City",
+      "placeholder": "Los Angeles",
+      "optional": "(optional)"
+    },
+    "postal_code": {
+      "label": "Postal Code",
+      "placeholder": "12345",
+      "optional": "(optional)",
+      "invalid": "Please enter a valid postal code"
+    }
+  },
+  "submit": "Join Interest List",
+  "submitting": "Submitting...",
+  "messages": {
+    "success": "Thank you {{name}}! We'll be in touch at {{email}}",
+    "error": "An error occurred. Please try again later.",
+    "required_fields": "Please fill in all required fields"
+  }
+}

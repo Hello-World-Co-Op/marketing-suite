@@ -1,0 +1,90 @@
+{
+  "hero": {
+    "scroll_hint": "Faites défiler pour en savoir plus"
+  },
+  "intro": {
+    "opening": "Vous. Oui, vous. Si vous aviez le pouvoir de créer un monde meilleur, que feriez-vous?",
+    "blueprint": "C'est la question que nous nous sommes posée chez Hello World Coopérative au début de 2024. Le résultat? Un <strong>plan méticuleusement conçu pour aider l'humanité à construire et guérir collectivement son monde.</strong>",
+    "mission_intro": "Cela semble ambitieux? Bien. Le cœur de notre mission est d'aider les communautés du monde entier à se rassembler pour prendre le contrôle de notre avenir. Nous visons à:",
+    "goals": {
+      "democratize": "Démocratiser l'accès à la propriété foncière, aux infrastructures et à d'autres actifs",
+      "protect": "Protéger les droits humains fondamentaux comme l'accès à la nourriture, au logement et à l'éducation",
+      "solutions": "Créer des solutions durables et pérennes aux plus grands problèmes du monde (nous vous regardons, changement climatique)"
+    },
+    "cta_prompt": "Nous voulons que vous fassiez partie du changement que vous voulez voir. Prêt à nous rejoindre?",
+    "cta_button": "Rejoignez Notre Liste d'Attente"
+  },
+  "video": {
+    "heading": "Une Histoire de Transformation",
+    "coming_soon": "Vidéo Bientôt Disponible",
+    "description": "Découvrez notre parcours de transformation et voyez comment nous construisons un monde meilleur ensemble",
+    "caption": "Découvrez l'histoire de la naissance de Hello World Coopérative et la vision qui guide notre mission."
+  },
+  "ecosystem": {
+    "heading": "Tout cela semble génial, mais quel est exactement le plan ici?",
+    "intro_1": "Nous comprenons. Changer le monde semble bien en théorie, mais ce dont nous avons vraiment besoin, c'est d'un plan. Ne vous inquiétez pas, nous sommes venus préparés.",
+    "intro_2": "L'écosystème Hello World Coopérative se compose de quelques parties fondamentales. Ces parties travaillent ensemble pour aider l'humanité à <strong>construire une société régénérative</strong> – un endroit où nous ne \"soutenons\" pas simplement la vie, mais où nous reconstituons également la Terre et ses habitants, créant des systèmes qui s'améliorent continuellement au fil du temps. Ces parties fondamentales sont:",
+    "parts": {
+      "otter_camp": "<strong>Otter Camp</strong> – une plateforme de financement participatif gamifiée",
+      "marketplace": "<strong>Le Marché Coopératif</strong> – une plateforme de commerce éthique et décentralisée",
+      "rabbit_whole": "<strong>Rabbit Whole</strong> – un hub social et éducatif",
+      "think_tank": "<strong>L'Application Think Tank</strong> – un assistant de rédaction de propositions alimenté par l'IA",
+      "campuses": "<strong>Campus Régénératifs</strong> – des centres réels pour vivre et travailler"
+    },
+    "conclusion": "Examinons chacun de ces éléments de plus près."
+  },
+  "otter_camp": {
+    "heading": "Otter Camp: Gamifier le Changement, Créer de l'Impact",
+    "intro": "Et si jouer à des jeux pouvait financer directement des projets concrets? Découvrez <strong>Otter Camp</strong>, notre plateforme de financement participatif gamifiée où chaque action que vous entreprenez se traduit par un changement significatif.",
+    "how_it_works": "Voici comment ça fonctionne:",
+    "steps": {
+      "play": "<strong>Jouez au Jeu:</strong> Profitez d'une expérience amusante et engageante conçue pour être addictive de la meilleure façon possible.",
+      "earn": "<strong>Gagnez des Jetons Numériques:</strong> Gagnez des jetons DOM (notre monnaie de jeu) grâce au gameplay.",
+      "fund": "<strong>Financez des Projets:</strong> Utilisez vos jetons pour voter et soutenir financièrement les projets proposés par d'autres membres de la coopérative.",
+      "impact": "<strong>Voyez l'Impact:</strong> Regardez vos contributions prendre vie au fur et à mesure que les projets sont approuvés et exécutés dans le monde réel."
+    },
+    "value": "Contrairement au financement participatif traditionnel, Otter Camp fait du financement un jeu. Vous ne faites pas seulement un don: vous faites partie d'une expérience passionnante et interactive où votre participation compte.",
+    "cta_button": "Obtenez un Accès Anticipé à Otter Camp"
+  },
+  "marketplace": {
+    "heading": "Le Marché: Achetez avec un Objectif",
+    "intro": "Chaque achat que vous effectuez peut soutenir les causes qui vous tiennent à cœur. Notre <strong>Marché</strong> vous permet d'acheter des biens et services auprès de vendeurs vérifiés de la coopérative, avec une partie de chaque vente allant directement au financement de projets régénératifs.",
+    "features": {
+      "verified": "<strong>Vendeurs Vérifiés:</strong> Tous les vendeurs sont membres de la coopérative et partagent nos valeurs.",
+      "transparent": "<strong>Impact Transparent:</strong> Voyez exactement comment votre achat contribue au changement dans le monde réel.",
+      "community": "<strong>Piloté par la Communauté:</strong> Soutenez les petites entreprises et les artisans locaux tout en faisant une différence."
+    },
+    "vision": "Considérez cela comme du shopping qui ne remplit pas seulement votre panier, mais remplit le monde d'espoir."
+  },
+  "rabbit_whole": {
+    "heading": "Rabbit Whole NFTs: Votre Preuve de Contribution",
+    "intro": "Vous voulez montrer votre impact? Les <strong>Rabbit Whole NFTs</strong> sont des jetons uniques vérifiés par blockchain qui prouvent vos contributions aux projets de la coopérative. Que vous ayez financé un jardin communautaire ou aidé à lancer une initiative d'énergie renouvelable, votre Rabbit Whole NFT est un badge d'honneur.",
+    "why_nfts": "Pourquoi des NFTs?",
+    "benefits": {
+      "proof": "<strong>Preuve Immuable:</strong> Vos contributions sont enregistrées en permanence sur la blockchain.",
+      "collect": "<strong>Collectionnable et Partageable:</strong> Montrez au monde ce que vous avez aidé à construire.",
+      "unlock": "<strong>Débloquez des Avantages:</strong> Certains NFTs donnent accès à des avantages et opportunités exclusifs de la coopérative."
+    },
+    "offline": "De plus, nous sommes passionnés par l'idée de ne laisser personne de côté. C'est pourquoi nous avons créé notre <strong>Programme d'Ambassadeurs Hors Ligne</strong>. Nous utilisons de petits serveurs Raspberry Pi peu coûteux qui aident à combler le fossé numérique et à apporter l'accès aux communautés avec un accès limité ou inexistant à Internet."
+  },
+  "think_tank": {
+    "heading": "Le Think Tank: Là où les Grandes Idées Prennent Forme",
+    "intro": "Vous avez une idée pour changer le monde? Le <strong>Think Tank</strong> est l'endroit où les membres de la coopérative proposent des projets, collaborent sur des solutions et affinent leurs visions avant de les soumettre à la communauté pour un vote.",
+    "process": "C'est un espace pour brainstormer, élaborer des stratégies et transformer les rêves en plans d'action. Que vous proposiez un nouveau projet d'énergie renouvelable ou que vous conceviez une initiative éducative de base, le Think Tank est votre rampe de lancement.",
+    "cta_button": "Rejoignez la Conversation"
+  },
+  "campuses": {
+    "heading": "Campus Régénératifs: Où les Composants Numériques Prennent Vie",
+    "intro": "Une fois que les idées de projets sont approuvées par la Coopérative via un processus de vote des membres et financées via le jeu dans Otter Camp, elles peuvent prendre vie sur nos campus régénératifs. Ce sont des lieux réels où les membres peuvent vivre et travailler ensemble pour construire des solutions aux problèmes modernes.",
+    "impact": "Les capteurs sur ces campus diffusent en temps réel des données transparentes sur l'impact positif comme le carbone séquestré directement sur la blockchain pour que le monde entier puisse le vérifier. De cette façon, chaque action dans Otter Camp contribue directement à un <strong>changement vérifiable et mesurable dans le monde réel</strong>.",
+    "cta_button": "Faites Partie du Mouvement"
+  },
+  "closing": {
+    "heading": "Prêt à Rejoindre Notre Monde?",
+    "intro": "Le monde n'appartient pas à une ou quelques personnes – il nous appartient à tous. Il est temps que nous commencions à agir en conséquence. En tant que Membre de Hello World Coopérative, vous aurez accès à tous ces outils et ressources afin de pouvoir commencer à faire une différence dans votre propre vie et dans celle des autres dès le premier jour.",
+    "call_to_action": "<strong>Ensemble, nous pouvons prendre le contrôle de notre avenir.</strong>",
+    "welcome": "Qui que vous soyez, nous avons une place pour vous.",
+    "cta_button": "Rejoignez Notre Liste d'Attente Maintenant",
+    "footer": "🌍 Construire un Avenir Régénératif, Ensemble"
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "app_name": "Hello World",
+  "org_type": "Cooperativa",
+  "full_name": "Hello World Cooperativa",
+  "language_selector": {
+    "label": "Selecionar Idioma",
+    "languages": {
+      "en": "English",
+      "es": "Español",
+      "fr": "Français",
+      "pt": "Português"
+    }
+  },
+  "buttons": {
+    "cancel": "Cancelar",
+    "close": "Fechar",
+    "submit": "Enviar",
+    "back": "Voltar",
+    "next": "Próximo"
+  },
+  "aria_labels": {
+    "required": "obrigatório",
+    "optional": "opcional",
+    "close_form": "Fechar formulário",
+    "select_language": "Selecionar idioma"
+  },
+  "hero": {
+    "tagline": "Construindo um Futuro Regenerativo, Juntos",
+    "mission": "Uma cooperativa global capacitando comunidades para criar mudanças duradouras",
+    "cta": "Junte-se ao Nosso Movimento",
+    "scroll_hint": "Role para saber mais"
+  }
+}

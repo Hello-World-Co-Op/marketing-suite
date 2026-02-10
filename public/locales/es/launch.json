@@ -1,0 +1,90 @@
+{
+  "hero": {
+    "scroll_hint": "Desplázate para aprender más"
+  },
+  "intro": {
+    "opening": "Tú. Sí, tú. Si tuvieras el poder de crear un mundo mejor, ¿qué harías?",
+    "blueprint": "Esa es la pregunta que nos hicimos en Hello World Cooperativa a principios de 2024. ¿El resultado? Un <strong>plan meticulosamente diseñado para ayudar a la humanidad a construir y sanar colectivamente su mundo.</strong>",
+    "mission_intro": "¿Suena ambicioso? Bien. El núcleo de nuestra misión es ayudar a las comunidades de todo el mundo a unirse para tomar el control de nuestro futuro. Nuestro objetivo es:",
+    "goals": {
+      "democratize": "Democratizar el acceso a la propiedad de tierras, infraestructura y otros activos",
+      "protect": "Proteger los derechos humanos fundamentales como el acceso a alimentos, vivienda y educación",
+      "solutions": "Crear soluciones duraderas y sostenibles a los mayores problemas del mundo (te estamos mirando, cambio climático)"
+    },
+    "cta_prompt": "Queremos que seas parte del cambio que quieres ver. ¿Listo para unirte?",
+    "cta_button": "Únete a Nuestra Lista de Espera"
+  },
+  "video": {
+    "heading": "Una Historia de Transformación",
+    "coming_soon": "Video Próximamente",
+    "description": "Observa nuestro viaje de transformación y mira cómo estamos construyendo un mundo mejor juntos",
+    "caption": "Descubre la historia de cómo nació Hello World Cooperativa y la visión que guía nuestra misión."
+  },
+  "ecosystem": {
+    "heading": "Todo eso suena genial, ¿pero cuál es exactamente el plan aquí?",
+    "intro_1": "Lo entendemos. Cambiar el mundo suena bien en teoría, pero lo que realmente necesitamos es un plan. No te preocupes, venimos preparados.",
+    "intro_2": "El ecosistema de Hello World Cooperativa consta de algunas partes fundamentales. Estas partes trabajan juntas para ayudar a la humanidad a <strong>construir una sociedad regenerativa</strong> – un lugar donde no solo \"sostenemos\" la vida, sino que también reponemos la Tierra y su gente, creando sistemas que mejoran continuamente con el tiempo. Estas partes fundamentales son:",
+    "parts": {
+      "otter_camp": "<strong>Otter Camp</strong> – una plataforma de crowdfunding gamificada",
+      "marketplace": "<strong>El Mercado Cooperativo</strong> – una plataforma de comercio ético y descentralizado",
+      "rabbit_whole": "<strong>Rabbit Whole</strong> – un centro social y educativo",
+      "think_tank": "<strong>La Aplicación Think Tank</strong> – un asistente de elaboración de propuestas impulsado por IA",
+      "campuses": "<strong>Campus Regenerativos</strong> – centros del mundo real para vivir y trabajar"
+    },
+    "conclusion": "Veamos cada uno de estos de cerca."
+  },
+  "otter_camp": {
+    "heading": "Otter Camp: Gamifica el Cambio, Genera Impacto",
+    "intro": "¿Qué pasaría si jugar pudiera financiar directamente proyectos del mundo real? Presentamos <strong>Otter Camp</strong>, nuestra plataforma de crowdfunding gamificada donde cada acción que tomas se traduce en un cambio significativo.",
+    "how_it_works": "Así es como funciona:",
+    "steps": {
+      "play": "<strong>Juega el Juego:</strong> Disfruta de una experiencia divertida y atractiva diseñada para ser adictiva de la mejor manera posible.",
+      "earn": "<strong>Gana Tokens Digitales:</strong> Gana tokens DOM (nuestra moneda del juego) a través del juego.",
+      "fund": "<strong>Financia Proyectos:</strong> Usa tus tokens para votar y respaldar financieramente proyectos propuestos por otros miembros de la cooperativa.",
+      "impact": "<strong>Ve el Impacto:</strong> Observa cómo tus contribuciones cobran vida a medida que los proyectos se aprueban y ejecutan en el mundo real."
+    },
+    "value": "A diferencia del crowdfunding tradicional, Otter Camp hace que financiar se sienta como jugar. No solo estás donando: eres parte de una experiencia emocionante e interactiva donde tu participación importa.",
+    "cta_button": "Obtén Acceso Anticipado a Otter Camp"
+  },
+  "marketplace": {
+    "heading": "El Mercado: Compra con Propósito",
+    "intro": "Cada compra que hagas puede apoyar las causas que te importan. Nuestro <strong>Mercado</strong> te permite comprar bienes y servicios de vendedores verificados de la cooperativa, con una parte de cada venta destinada directamente a financiar proyectos regenerativos.",
+    "features": {
+      "verified": "<strong>Vendedores Verificados:</strong> Todos los vendedores son miembros de la cooperativa y comparten nuestros valores.",
+      "transparent": "<strong>Impacto Transparente:</strong> Ve exactamente cómo tu compra contribuye al cambio en el mundo real.",
+      "community": "<strong>Impulsado por la Comunidad:</strong> Apoya a pequeñas empresas y artesanos locales mientras marcas la diferencia."
+    },
+    "vision": "Piénsalo como comprar que no solo llena tu carrito, sino que llena el mundo de esperanza."
+  },
+  "rabbit_whole": {
+    "heading": "Rabbit Whole NFTs: Tu Prueba de Contribución",
+    "intro": "¿Quieres mostrar tu impacto? Los <strong>Rabbit Whole NFTs</strong> son tokens únicos verificados por blockchain que prueban tus contribuciones a los proyectos de la cooperativa. Ya sea que hayas financiado un jardín comunitario o ayudado a lanzar una iniciativa de energía renovable, tu Rabbit Whole NFT es una insignia de honor.",
+    "why_nfts": "¿Por qué NFTs?",
+    "benefits": {
+      "proof": "<strong>Prueba Inmutable:</strong> Tus contribuciones se registran permanentemente en la blockchain.",
+      "collect": "<strong>Coleccionable y Compartible:</strong> Muestra al mundo lo que has ayudado a construir.",
+      "unlock": "<strong>Desbloquea Beneficios:</strong> Ciertos NFTs otorgan acceso a beneficios y oportunidades exclusivas de la cooperativa."
+    },
+    "offline": "Además, nos apasiona asegurarnos de que nadie se quede atrás. Por eso creamos nuestro <strong>Programa de Embajadores Sin Conexión</strong>. Usamos pequeños y económicos servidores Raspberry Pi que ayudan a cerrar la brecha digital y llevar acceso a comunidades con acceso limitado o nulo a internet."
+  },
+  "think_tank": {
+    "heading": "El Think Tank: Donde las Grandes Ideas Toman Forma",
+    "intro": "¿Tienes una idea para cambiar el mundo? El <strong>Think Tank</strong> es donde los miembros de la cooperativa proponen proyectos, colaboran en soluciones y refinan sus visiones antes de llevarlas a la comunidad para votar.",
+    "process": "Es un espacio para hacer lluvia de ideas, estrategias y convertir sueños en planes accionables. Ya sea que estés presentando un nuevo proyecto de energía renovable o diseñando una iniciativa de educación de base, el Think Tank es tu plataforma de lanzamiento.",
+    "cta_button": "Únete a la Conversación"
+  },
+  "campuses": {
+    "heading": "Campus Regenerativos: Donde los Componentes Digitales Cobran Vida",
+    "intro": "Una vez que las ideas de proyectos son aprobadas por la Cooperativa a través de un proceso de votación de miembros y financiadas mediante el juego en Otter Camp, pueden cobrar vida en nuestros campus regenerativos. Estos son lugares del mundo real donde los miembros pueden vivir y trabajar juntos para construir soluciones a problemas modernos.",
+    "impact": "Los sensores en estos campus transmiten datos en tiempo real y transparentes sobre el impacto positivo, como el carbono secuestrado, directamente a la blockchain para que todo el mundo lo verifique. De esta manera, cada acción en Otter Camp contribuye directamente a un <strong>cambio verificable y medible en el mundo real</strong>.",
+    "cta_button": "Sé Parte del Movimiento"
+  },
+  "closing": {
+    "heading": "¿Listo para Unirte a Nuestro Mundo?",
+    "intro": "El mundo no pertenece a una o unas pocas personas: nos pertenece a todos. Es hora de que empecemos a actuar como tal. Como Miembro de Hello World Cooperativa, obtendrás acceso a todas estas herramientas y recursos para que puedas comenzar a marcar la diferencia en tu propia vida y en la de los demás desde el primer día.",
+    "call_to_action": "<strong>Juntos, podemos tomar el control de nuestro futuro.</strong>",
+    "welcome": "Seas quien seas, tenemos un lugar para ti.",
+    "cta_button": "Únete a Nuestra Lista de Espera Ahora",
+    "footer": "🌍 Construyendo un Futuro Regenerativo, Juntos"
+  }
+}

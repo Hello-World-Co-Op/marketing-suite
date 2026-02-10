@@ -1,0 +1,33 @@
+{
+  "app_name": "Hello World",
+  "org_type": "Co-op",
+  "full_name": "Hello World Co-op",
+  "language_selector": {
+    "label": "Select Language",
+    "languages": {
+      "en": "English",
+      "es": "Español",
+      "fr": "Français",
+      "pt": "Português"
+    }
+  },
+  "buttons": {
+    "cancel": "Cancel",
+    "close": "Close",
+    "submit": "Submit",
+    "back": "Back",
+    "next": "Next"
+  },
+  "aria_labels": {
+    "required": "required",
+    "optional": "optional",
+    "close_form": "Close form",
+    "select_language": "Select language"
+  },
+  "hero": {
+    "tagline": "Building a Regenerative Future, Together",
+    "mission": "A global cooperative empowering communities to create lasting change",
+    "cta": "Join Our Movement",
+    "scroll_hint": "Scroll to learn more"
+  }
+}

@@ -1,0 +1,52 @@
+{
+  "heading": "Rejoindre la Liste d'Intérêt",
+  "waitlist_heading": "Rejoignez Notre Liste d'Attente",
+  "fields": {
+    "first_name": {
+      "label": "Prénom",
+      "placeholder": "Jean",
+      "required": "Le prénom est requis",
+      "min_length": "Le prénom doit contenir au moins 2 caractères"
+    },
+    "last_name": {
+      "label": "Nom de Famille",
+      "placeholder": "Dupont",
+      "required": "Le nom de famille est requis",
+      "min_length": "Le nom de famille doit contenir au moins 2 caractères"
+    },
+    "email": {
+      "label": "Adresse Email",
+      "placeholder": "jean.dupont@exemple.fr",
+      "required": "L'email est requis",
+      "invalid": "Veuillez entrer une adresse email valide",
+      "help": "Nous vous enverrons des mises à jour sur Hello World Coopérative"
+    },
+    "country": {
+      "label": "Pays",
+      "placeholder": "Sélectionnez un pays",
+      "optional": "(facultatif)"
+    },
+    "state": {
+      "label": "État/Province",
+      "placeholder": "Sélectionnez un état/province"
+    },
+    "city": {
+      "label": "Ville",
+      "placeholder": "Paris",
+      "optional": "(facultatif)"
+    },
+    "postal_code": {
+      "label": "Code Postal",
+      "placeholder": "75001",
+      "optional": "(facultatif)",
+      "invalid": "Veuillez entrer un code postal valide"
+    }
+  },
+  "submit": "Rejoindre la Liste d'Intérêt",
+  "submitting": "Envoi en cours...",
+  "messages": {
+    "success": "Merci {{name}}! Nous vous contacterons à {{email}}",
+    "error": "Une erreur s'est produite. Veuillez réessayer plus tard.",
+    "required_fields": "Veuillez remplir tous les champs obligatoires"
+  }
+}

@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="400" height="400">
+  <!-- Globe Circle -->
+  <circle cx="200" cy="200" r="180" fill="#0ea5e9" opacity="0.2" stroke="#0284c7" stroke-width="4"/>
+
+  <!-- Latitude Lines -->
+  <ellipse cx="200" cy="200" rx="180" ry="60" fill="none" stroke="#0284c7" stroke-width="2" opacity="0.4"/>
+  <ellipse cx="200" cy="200" rx="180" ry="120" fill="none" stroke="#0284c7" stroke-width="2" opacity="0.4"/>
+
+  <!-- Longitude Lines -->
+  <ellipse cx="200" cy="200" rx="60" ry="180" fill="none" stroke="#0284c7" stroke-width="2" opacity="0.4"/>
+  <ellipse cx="200" cy="200" rx="120" ry="180" fill="none" stroke="#0284c7" stroke-width="2" opacity="0.4"/>
+
+  <!-- Equator -->
+  <line x1="20" y1="200" x2="380" y2="200" stroke="#0284c7" stroke-width="2" opacity="0.6"/>
+
+  <!-- Prime Meridian -->
+  <line x1="200" y1="20" x2="200" y2="380" stroke="#0284c7" stroke-width="2" opacity="0.6"/>
+
+  <!-- Continents (simplified shapes) -->
+  <path d="M 120 150 Q 140 120, 160 150 T 180 180 L 160 200 Z" fill="#059669" opacity="0.6"/>
+  <path d="M 220 100 Q 250 90, 270 110 L 280 140 L 260 160 L 230 150 Z" fill="#059669" opacity="0.6"/>
+  <path d="M 100 220 Q 130 210, 150 230 L 140 260 L 110 250 Z" fill="#059669" opacity="0.6"/>
+  <path d="M 240 220 Q 270 210, 290 230 L 300 270 L 280 290 L 250 280 L 240 250 Z" fill="#059669" opacity="0.6"/>
+</svg>
