@@ -109,18 +109,25 @@ async function sendToBackend(event: string, data: AnalyticsProperties): Promise<
 
 /**
  * Get or create anonymous user ID for tracking
+ * Uses localStorage with fallback for private browsing mode
  */
 function getUserId(): string {
   const USER_ID_KEY = 'analytics_user_id';
 
-  let userId = localStorage.getItem(USER_ID_KEY);
+  try {
+    let userId = localStorage.getItem(USER_ID_KEY);
 
-  if (!userId) {
-    userId = `user_${Date.now()}_${Math.random().toString(36).substring(7)}`;
-    localStorage.setItem(USER_ID_KEY, userId);
+    if (!userId) {
+      userId = `user_${Date.now()}_${Math.random().toString(36).substring(7)}`;
+      localStorage.setItem(USER_ID_KEY, userId);
+    }
+
+    return userId;
+  } catch (error) {
+    // localStorage unavailable (private browsing, disabled, or quota exceeded)
+    // Generate ephemeral ID for this session only
+    return `user_${Date.now()}_${Math.random().toString(36).substring(7)}`;
   }
-
-  return userId;
 }
 
 /**

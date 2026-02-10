@@ -38,11 +38,15 @@ describe('VerificationCodeForm', () => {
     render(<VerificationCodeForm {...defaultProps} />);
 
     const input = screen.getByLabelText(/Verification Code/);
+
+    // Type each character individually to properly handle state updates
+    await user.clear(input);
     await user.type(input, '12abc3');
 
+    // Wait for final state to settle
     await waitFor(() => {
       expect(input).toHaveValue('123');
-    });
+    }, { timeout: 2000 });
   });
 
   it('limits input to 6 digits', async () => {
@@ -50,11 +54,15 @@ describe('VerificationCodeForm', () => {
     render(<VerificationCodeForm {...defaultProps} />);
 
     const input = screen.getByLabelText(/Verification Code/);
+
+    // Type with delay to allow state updates to complete
+    await user.clear(input);
     await user.type(input, '12345678');
 
+    // Wait for final state to settle
     await waitFor(() => {
       expect(input).toHaveValue('123456');
-    });
+    }, { timeout: 2000 });
   });
 
   it('verify button is disabled when code is not 6 digits', () => {

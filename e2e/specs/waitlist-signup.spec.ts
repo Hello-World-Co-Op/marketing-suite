@@ -62,7 +62,11 @@ test.describe('Waitlist Signup Flow', () => {
     await expect(page.locator('#first_name')).not.toBeVisible({ timeout: 3000 });
   });
 
-  test('country dropdown populates state dropdown', async ({ page }) => {
+  test.skip('country dropdown populates state dropdown', async ({ page }) => {
+    // TODO: Implement this test once Select component interaction is defined
+    // The Headless UI Select component requires specific interaction patterns
+    // that need to be determined based on the actual implementation
+
     // Open the form
     const ctaButton = page.locator('main button').first();
     await ctaButton.click();
@@ -71,12 +75,12 @@ test.describe('Waitlist Signup Flow', () => {
     await page.waitForSelector('#first_name', { timeout: 3000 });
 
     // Select United States from country dropdown
-    // Note: This depends on the Select component implementation
     const countrySelect = page.locator('#country');
-    if (await countrySelect.isVisible()) {
-      // Headless UI select - would need specific interaction
-      // This is a skeleton test; actual implementation depends on Select component
-      expect(true).toBe(true);
-    }
+    await expect(countrySelect).toBeVisible();
+
+    // TODO: Add interaction with Headless UI Select:
+    // 1. Click to open dropdown
+    // 2. Select "United States"
+    // 3. Verify state dropdown becomes enabled and populated
   });
 });
