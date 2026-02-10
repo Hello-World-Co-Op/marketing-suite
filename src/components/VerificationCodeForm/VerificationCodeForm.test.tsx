@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import VerificationCodeForm from './VerificationCodeForm';
 
@@ -40,7 +40,9 @@ describe('VerificationCodeForm', () => {
     const input = screen.getByLabelText(/Verification Code/);
     await user.type(input, '12abc3');
 
-    expect(input).toHaveValue('123');
+    await waitFor(() => {
+      expect(input).toHaveValue('123');
+    });
   });
 
   it('limits input to 6 digits', async () => {
@@ -50,7 +52,9 @@ describe('VerificationCodeForm', () => {
     const input = screen.getByLabelText(/Verification Code/);
     await user.type(input, '12345678');
 
-    expect(input).toHaveValue('123456');
+    await waitFor(() => {
+      expect(input).toHaveValue('123456');
+    });
   });
 
   it('verify button is disabled when code is not 6 digits', () => {
@@ -67,8 +71,10 @@ describe('VerificationCodeForm', () => {
     const input = screen.getByLabelText(/Verification Code/);
     await user.type(input, '123456');
 
-    const verifyButton = screen.getByRole('button', { name: /Verify Email/ });
-    expect(verifyButton).toBeEnabled();
+    await waitFor(() => {
+      const verifyButton = screen.getByRole('button', { name: /Verify Email/ });
+      expect(verifyButton).toBeEnabled();
+    });
   });
 
   it('calls onVerify with code when form is submitted', async () => {
@@ -82,7 +88,9 @@ describe('VerificationCodeForm', () => {
     const verifyButton = screen.getByRole('button', { name: /Verify Email/ });
     await user.click(verifyButton);
 
-    expect(onVerify).toHaveBeenCalledWith('123456');
+    await waitFor(() => {
+      expect(onVerify).toHaveBeenCalledWith('123456');
+    });
   });
 
   it('calls onCancel when cancel button is clicked', async () => {
@@ -93,7 +101,9 @@ describe('VerificationCodeForm', () => {
     const cancelButton = screen.getByRole('button', { name: /Cancel/ });
     await user.click(cancelButton);
 
-    expect(onCancel).toHaveBeenCalled();
+    await waitFor(() => {
+      expect(onCancel).toHaveBeenCalled();
+    });
   });
 
   it('calls onResend when resend button is clicked', async () => {
@@ -104,7 +114,9 @@ describe('VerificationCodeForm', () => {
     const resendButton = screen.getByRole('button', { name: /Resend Code/ });
     await user.click(resendButton);
 
-    expect(onResend).toHaveBeenCalled();
+    await waitFor(() => {
+      expect(onResend).toHaveBeenCalled();
+    });
   });
 
   it('shows error message on verify failure', async () => {
@@ -118,7 +130,9 @@ describe('VerificationCodeForm', () => {
     const verifyButton = screen.getByRole('button', { name: /Verify Email/ });
     await user.click(verifyButton);
 
-    expect(await screen.findByText('Invalid code')).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText('Invalid code')).toBeInTheDocument();
+    });
   });
 
   it('has proper ARIA attributes for accessibility', () => {

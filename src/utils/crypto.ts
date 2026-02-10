@@ -97,19 +97,14 @@ export async function requestTemporaryKey(
   canisterId: string
 ): Promise<TemporaryKeyResponse> {
   const oracleBridgeUrl = import.meta.env.VITE_ORACLE_BRIDGE_URL || 'http://localhost:8787';
-  const apiToken = import.meta.env.VITE_ORACLE_BRIDGE_API_TOKEN;
 
-  const headers: HeadersInit = {
-    'Content-Type': 'application/json',
-  };
-
-  if (apiToken) {
-    headers['Authorization'] = `Bearer ${apiToken}`;
-  }
-
+  // Oracle bridge authenticates clients via CORS origin checking, not API tokens.
+  // The origin header is automatically sent by the browser and validated server-side.
   const response = await fetch(`${oracleBridgeUrl}/kdf/temporary-key`, {
     method: 'POST',
-    headers,
+    headers: {
+      'Content-Type': 'application/json',
+    },
     body: JSON.stringify({
       email_hash: emailHash,
       canister_id: canisterId,

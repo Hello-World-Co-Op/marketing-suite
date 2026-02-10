@@ -99,7 +99,6 @@ Required environment variables (configure in `.env.local`):
 - `VITE_ORACLE_BRIDGE_URL` - Oracle bridge URL for encryption keys
 
 Optional:
-- `VITE_ORACLE_BRIDGE_API_TOKEN` - Oracle bridge API token
 - `VITE_GA_MEASUREMENT_ID` - Google Analytics ID
 - `VITE_POSTHOG_KEY` - PostHog API key
 - `VITE_ANALYTICS_ENDPOINT` - Custom analytics endpoint
@@ -139,6 +138,35 @@ dfx deploy --network testnet
 # or
 dfx deploy --network mainnet
 ```
+
+### Rollback Procedure
+
+If a deployment causes issues, follow these steps to rollback:
+
+1. **Identify the previous deployment:**
+   - Check git log: `git log --oneline -n 5`
+   - Check GitHub releases for the last stable version
+   - Note the commit hash of the last known good deployment
+
+2. **Revert the deployment:**
+   - For code-level rollback: `git revert <commit-hash> && git push`
+   - Pushing to main triggers automatic redeploy via CI/CD workflow
+   - Monitor GitHub Actions workflow to confirm successful deployment
+
+3. **For canister-level rollback (advanced):**
+   - Obtain the previous WASM file from git history or build artifacts
+   - Run: `dfx canister install marketing_suite_assets --mode reinstall --wasm <previous.wasm> --network <testnet|mainnet>`
+   - This reinstalls the canister with the previous version
+
+4. **Emergency DNS rollback:**
+   - If the new canister is broken, revert DNS to the old monolith canister
+   - Update IC boundary node routing to point www.helloworlddao.com back to previous canister
+   - This requires IC dashboard access or dfx routing configuration
+
+5. **Verification:**
+   - Visit https://www.helloworlddao.com to confirm rollback successful
+   - Test all critical paths (landing page, form submission, email verification)
+   - Monitor error logs and user reports
 
 ## Architecture Notes
 

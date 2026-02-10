@@ -15,4 +15,5 @@ jobs:
     uses: Hello-World-Co-Op/.github/.github/workflows/suite-deploy.yml@main
     with:
       suite-name: marketing-suite
+      canister-name: marketing_suite_assets
     secrets: inherit

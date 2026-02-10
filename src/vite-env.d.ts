@@ -7,7 +7,6 @@ interface ImportMetaEnv {
   readonly VITE_NETWORK: string;
   readonly VITE_ENVIRONMENT: 'development' | 'staging' | 'production';
   readonly VITE_ORACLE_BRIDGE_URL: string;
-  readonly VITE_ORACLE_BRIDGE_API_TOKEN: string;
   readonly VITE_POSTHOG_KEY: string;
   readonly VITE_POSTHOG_HOST: string;
   readonly VITE_GA_MEASUREMENT_ID: string;
