@@ -1,4 +1,5 @@
 import { cn } from '../utils/cn';
+import { SEO } from '../components/SEO';
 
 /**
  * Privacy Policy Page
@@ -14,6 +15,12 @@ import { cn } from '../utils/cn';
 export default function PrivacyPolicy() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
+      <SEO
+        title="Privacy Policy | Hello World Co-Op"
+        description="Learn how Hello World Co-Op DAO protects your privacy and personal data, including KYC verification, data retention policies, and your GDPR rights."
+        url="https://www.helloworlddao.com/privacy-policy"
+      />
+
       {/* Header */}
       <header className="bg-white shadow-sm">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6">

@@ -1,0 +1,7 @@
+# Hello World Co-Op - Marketing Suite
+# Allow all crawlers to index all public pages
+
+User-agent: *
+Allow: /
+
+Sitemap: https://www.helloworlddao.com/sitemap.xml

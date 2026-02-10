@@ -25,7 +25,7 @@ Public-facing marketing website for Hello World Co-Op DAO. Features the landing 
 ## Available Scripts
 
 - `npm run dev` - Start development server (port 5173)
-- `npm run build` - Build for production (TypeScript check + Vite build)
+- `npm run build` - Build for production (TypeScript check + Vite build + prerender + sitemap)
 - `npm test` - Run unit tests (Vitest)
 - `npm run test:watch` - Run tests in watch mode
 - `npm run test:coverage` - Generate coverage report
@@ -44,6 +44,7 @@ marketing-suite/
 │   │   ├── HeroSection/          # Hero with typing animation and globe
 │   │   ├── AboutSection/         # Mission and vision content
 │   │   ├── LaunchContent/        # 9 content sections (Intro, Video, Ecosystem, etc.)
+│   │   ├── SEO/                  # Reusable SEO component (meta tags, OG, Twitter)
 │   │   ├── ExpandableForm/       # Animated form container for CTA buttons
 │   │   ├── InterestForm/         # Waitlist signup form (name, email, location)
 │   │   ├── VerificationCodeForm/ # 6-digit email verification
@@ -68,10 +69,16 @@ marketing-suite/
 │   ├── data/                     # Static data (postal code formats)
 │   ├── test/                     # Test setup and utilities
 │   ├── App.tsx                   # Root component with router
-│   ├── main.tsx                  # Entry point with i18n init
+│   ├── entry-prerender.tsx        # SSR entry point for static HTML generation
+│   ├── main.tsx                  # Entry point with i18n init and hydration
 │   └── index.css                 # Global styles and Tailwind config
+├── scripts/
+│   ├── prerender.ts              # Build-time static HTML pre-rendering
+│   └── generate-sitemap.ts       # Build-time sitemap.xml generation
 ├── public/
 │   ├── locales/                  # i18n translation files (en, es, fr, pt)
+│   ├── robots.txt                # Search engine crawler directives
+│   ├── og-image.png              # Open Graph social sharing image
 │   ├── world.jpg                 # Hero globe image
 │   └── globe.svg                 # Globe SVG icon
 ├── e2e/specs/                    # Playwright E2E test skeletons
@@ -89,6 +96,7 @@ marketing-suite/
 - **Internationalization**: 4 languages (English, Spanish, French, Portuguese)
 - **Accessibility**: WCAG 2.1 AA compliant with proper ARIA attributes
 - **Code Splitting**: Lazy-loaded routes and manual chunks for optimal bundle size
+- **SEO Pre-rendering**: Static HTML generation at build time for search engine indexing
 
 ## Environment Variables
 
@@ -112,7 +120,7 @@ Total gzipped JS: ~353 KB (split across lazy-loaded chunks)
 
 ## Testing
 
-### Unit Tests (Vitest) - 63 tests
+### Unit Tests (Vitest) - 83 tests
 
 ```bash
 npm test                  # Run once
@@ -126,6 +134,56 @@ npm run test:coverage     # With coverage
 npm run test:e2e          # Run all browsers
 npm run test:e2e:ui       # Interactive UI mode
 ```
+
+## SEO
+
+### How It Works
+
+The build pipeline generates SEO-optimized static HTML:
+
+1. **`vite build`** produces the standard SPA bundle in `dist/`
+2. **`scripts/prerender.ts`** renders each route to static HTML using `ReactDOMServer.renderToString()`, injecting:
+   - Full page content into `<div id="root">` (instead of empty div)
+   - SEO meta tags from `react-helmet-async` into `<head>` (title, OG, Twitter Card, canonical)
+3. **`scripts/generate-sitemap.ts`** creates `dist/sitemap.xml` with all routes
+
+When the browser loads a pre-rendered page, React detects existing content and **hydrates** (attaches event handlers) instead of re-rendering from scratch.
+
+### Build Output
+
+After `npm run build`, the dist/ directory contains:
+- `dist/index.html` - Pre-rendered homepage with full content
+- `dist/privacy-policy/index.html` - Pre-rendered privacy policy
+- `dist/sitemap.xml` - Sitemap for search engines
+- `dist/robots.txt` - Crawler directives (from public/)
+- `dist/og-image.png` - Open Graph social sharing image
+
+### Adding SEO to a New Page
+
+1. Import the SEO component:
+   ```tsx
+   import { SEO } from '../components/SEO';
+   ```
+2. Add `<SEO>` at the top of your page component's JSX:
+   ```tsx
+   <SEO
+     title="Page Title | Hello World Co-Op"
+     description="Description for search engines (150-160 chars)"
+     url="https://www.helloworlddao.com/your-page"
+   />
+   ```
+3. Add the route to `src/entry-prerender.tsx` (routes array and Routes component)
+4. Add the route to `scripts/generate-sitemap.ts` (routes array)
+5. Run `npm run build` to verify pre-rendered output
+
+### Meta Tags
+
+Each page includes:
+- `<title>` - Page title
+- `<meta name="description">` - Search engine description
+- `<meta property="og:*">` - Open Graph tags (title, description, image, url, type, site_name)
+- `<meta name="twitter:*">` - Twitter Card tags (card, title, description, image)
+- `<link rel="canonical">` - Canonical URL
 
 ## Deployment
 

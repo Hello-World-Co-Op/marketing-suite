@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
+import { SEO } from '../components/SEO';
 import { HeroSection } from '../components/HeroSection';
 import {
   IntroSection,
@@ -237,6 +238,12 @@ export default function LaunchPage() {
 
   return (
     <div className="min-h-screen relative">
+      <SEO
+        title="Hello World Co-Op | Building a Regenerative Future"
+        description="Join Hello World Co-Op DAO — a community-driven cooperative building regenerative solutions through decentralized governance, crowdfunding, education, and a sustainable marketplace on the Internet Computer."
+        url="https://www.helloworlddao.com/"
+      />
+
       {/* Sunrise Background - Fixed behind everything */}
       <div
         className="fixed inset-0 -z-10 transition-all duration-300"

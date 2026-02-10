@@ -13,8 +13,22 @@ if (import.meta.env.PROD) {
   }
 }
 
-ReactDOM.createRoot(document.getElementById('root')!).render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>,
-);
+const rootElement = document.getElementById('root')!;
+
+// If the root element has pre-rendered content (from the build-time prerender step),
+// use hydrateRoot so React attaches event handlers to existing DOM.
+// Otherwise, use createRoot for a fresh render (e.g., during development).
+if (rootElement.hasChildNodes()) {
+  ReactDOM.hydrateRoot(
+    rootElement,
+    <React.StrictMode>
+      <App />
+    </React.StrictMode>,
+  );
+} else {
+  ReactDOM.createRoot(rootElement).render(
+    <React.StrictMode>
+      <App />
+    </React.StrictMode>,
+  );
+}

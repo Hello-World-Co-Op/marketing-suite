@@ -23,22 +23,25 @@ vi.mock('react-i18next', () => ({
   },
 }));
 
-// Mock window.scrollTo
-Object.defineProperty(window, 'scrollTo', {
-  value: vi.fn(),
-  writable: true,
-});
+// Browser-only mocks — skip when running in Node environment (e.g., SSR tests)
+if (typeof window !== 'undefined') {
+  // Mock window.scrollTo
+  Object.defineProperty(window, 'scrollTo', {
+    value: vi.fn(),
+    writable: true,
+  });
 
-// Mock IntersectionObserver
-class MockIntersectionObserver {
-  observe = vi.fn();
-  disconnect = vi.fn();
-  unobserve = vi.fn();
+  // Mock IntersectionObserver
+  class MockIntersectionObserver {
+    observe = vi.fn();
+    disconnect = vi.fn();
+    unobserve = vi.fn();
+  }
+  Object.defineProperty(window, 'IntersectionObserver', {
+    value: MockIntersectionObserver,
+    writable: true,
+  });
+
+  // Mock scrollIntoView
+  Element.prototype.scrollIntoView = vi.fn();
 }
-Object.defineProperty(window, 'IntersectionObserver', {
-  value: MockIntersectionObserver,
-  writable: true,
-});
-
-// Mock scrollIntoView
-Element.prototype.scrollIntoView = vi.fn();
