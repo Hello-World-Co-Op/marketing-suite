@@ -39,21 +39,20 @@ export default function InterestForm({
     defaultValues,
   });
 
-  const formValues = watch();
-
-  // Notify parent of form changes for state persistence
+  // Notify parent of form changes using react-hook-form's subscription API.
+  // This avoids the infinite render loop caused by watch() returning new
+  // object references — the subscription fires only on actual field changes,
+  // not on re-renders.
   useEffect(() => {
-    if (onFormChange) {
-      onFormChange(formValues);
-    }
-  }, [formValues, onFormChange]);
-
-  useEffect(() => {
-    if (defaultValues) {
-      reset(defaultValues);
-    }
+    if (!onFormChange) return;
+    const subscription = watch((value) => {
+      onFormChange(value as Partial<InterestFormData>);
+    });
+    return () => subscription.unsubscribe();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [defaultValues]);
+  }, [watch]);
+
+  const watchedCountry = watch('country');
 
   const countries = useMemo(
     () =>
@@ -65,11 +64,10 @@ export default function InterestForm({
   );
 
   const [states, setStates] = useState<{ value: string; label: string }[]>([]);
-  const selectedCountry = watch('country');
 
   useEffect(() => {
-    if (selectedCountry) {
-      const countryStates = State.getStatesOfCountry(selectedCountry).map((s) => ({
+    if (watchedCountry) {
+      const countryStates = State.getStatesOfCountry(watchedCountry).map((s) => ({
         value: s.isoCode,
         label: s.name,
       }));
@@ -77,9 +75,9 @@ export default function InterestForm({
     } else {
       setStates([]);
     }
-  }, [selectedCountry]);
+  }, [watchedCountry]);
 
-  const postalCodePlaceholder = selectedCountry ? getPostalCodeExample(selectedCountry) : '12345';
+  const postalCodePlaceholder = watchedCountry ? getPostalCodeExample(watchedCountry) : '12345';
 
   const handleFormSubmit = async (data: InterestFormData) => {
     try {

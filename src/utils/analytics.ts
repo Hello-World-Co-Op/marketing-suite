@@ -123,7 +123,7 @@ function getUserId(): string {
     }
 
     return userId;
-  } catch (error) {
+  } catch {
     // localStorage unavailable (private browsing, disabled, or quota exceeded)
     // Generate ephemeral ID for this session only
     return `user_${Date.now()}_${Math.random().toString(36).substring(7)}`;
