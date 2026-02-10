@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { HeroSection } from '../components/HeroSection';
 import {
   IntroSection,
@@ -60,15 +60,15 @@ export default function LaunchPage() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, [handleScroll]);
 
-  const handleFormChange = (data: Partial<InterestFormData>) => {
+  const handleFormChange = useCallback((data: Partial<InterestFormData>) => {
     // Update form data state to persist across section changes
     setFormData(data);
-  };
+  }, []);
 
-  const handleFormClear = () => {
+  const handleFormClear = useCallback(() => {
     // Clear form data when user clicks X button
     setFormData({});
-  };
+  }, []);
 
   const handleFormSubmit = async (data: InterestFormData) => {
     try {
