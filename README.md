@@ -239,6 +239,19 @@ If a deployment causes issues, follow these steps to rollback:
 - Vitest for unit tests
 - Playwright for E2E tests
 
+**This is a standalone suite** -- it does not depend on `@hello-world-co-op/auth` or `@hello-world-co-op/api`. There is no user authentication requirement for the marketing site.
+
+## FAS Developer Documentation
+
+This suite is part of the [Frontend Application Split (FAS)](https://github.com/Hello-World-Co-Op/docs/blob/main/developer/fas-architecture.md) project. For cross-cutting documentation:
+
+- [FAS Architecture Overview](https://github.com/Hello-World-Co-Op/docs/blob/main/developer/fas-architecture.md) -- Package/suite architecture, dependency diagram, CI/CD pipeline
+- [FAS Repository Map](https://github.com/Hello-World-Co-Op/docs/blob/main/developer/fas-repository-map.md) -- All FAS repos and "where do I make changes?"
+- [FAS Local Setup Guide](https://github.com/Hello-World-Co-Op/docs/blob/main/developer/fas-local-setup.md) -- npm link workflow, cross-package development
+- [FAS Suite Creation Guide](https://github.com/Hello-World-Co-Op/docs/blob/main/developer/fas-create-suite.md) -- Creating new suites from the template
+- [FAS Troubleshooting](https://github.com/Hello-World-Co-Op/docs/blob/main/developer/fas-troubleshooting.md) -- Common issues and fixes (see SEO section)
+- [FAS Rollback Procedures](https://github.com/Hello-World-Co-Op/docs/blob/main/developer/fas-rollback-procedures.md) -- Suite-specific rollback steps
+
 ## License
 
 MIT
