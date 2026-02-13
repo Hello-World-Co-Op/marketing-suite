@@ -8,6 +8,8 @@ import type {
   IndividualResult,
   VerifyResult,
   Stats,
+  RegisterEmailPasswordRequest,
+  AuthResponse,
 } from '../types/user-service';
 
 // Candid interface definition for user-service (marketing-suite subset)
@@ -63,6 +65,53 @@ const idlFactory = (({ IDL }: { IDL: typeof import('@dfinity/candid').IDL }) => 
     pending_verifications: IDL.Nat64,
   });
 
+  // Auth types for registration (Story 2.1.2, BL-011.2)
+  const AuthMethodType = IDL.Variant({
+    EmailPassword: IDL.Null,
+    InternetIdentity: IDL.Null,
+    Google: IDL.Null,
+    Apple: IDL.Null,
+    Microsoft: IDL.Null,
+    GitHub: IDL.Null,
+    Discord: IDL.Null,
+  });
+
+  const RegisterEmailPasswordRequest = IDL.Record({
+    email_encrypted: IDL.Text,
+    first_name_encrypted: IDL.Text,
+    last_name_encrypted: IDL.Text,
+    email_hash: IDL.Text,
+    password: IDL.Text,
+    encryption_key_id: IDL.Text,
+    encrypted_recovery_key: IDL.Text,
+    password_salt: IDL.Text,
+    email_plaintext_for_verification: IDL.Text,
+    ip_hash: IDL.Opt(IDL.Text),
+    // BL-011.2: DOB fields for COPPA compliance
+    dob_encrypted: IDL.Text,
+    dob_plaintext_for_validation: IDL.Text,
+    // FOS-3.3.1: Optional CRM fields for lead tracking
+    company: IDL.Opt(IDL.Text),
+    job_title: IDL.Opt(IDL.Text),
+    interest_area: IDL.Opt(IDL.Text),
+    referral_source: IDL.Opt(IDL.Text),
+  });
+
+  const AuthResponse = IDL.Record({
+    success: IDL.Bool,
+    message: IDL.Text,
+    access_token: IDL.Opt(IDL.Text),
+    refresh_token: IDL.Opt(IDL.Text),
+    session_id: IDL.Opt(IDL.Text),
+    user_id: IDL.Opt(IDL.Text),
+    preferred_auth_method: IDL.Opt(AuthMethodType),
+    encrypted_recovery_key: IDL.Opt(IDL.Vec(IDL.Nat8)),
+    password_salt: IDL.Opt(IDL.Vec(IDL.Nat8)),
+    email_encrypted: IDL.Opt(IDL.Vec(IDL.Nat8)),
+    first_name_encrypted: IDL.Opt(IDL.Vec(IDL.Nat8)),
+    last_name_encrypted: IDL.Opt(IDL.Vec(IDL.Nat8)),
+  });
+
   return IDL.Service({
     submit_individual: IDL.Func(
       [IndividualRequest, IDL.Opt(AddressRequest)],
@@ -73,6 +122,11 @@ const idlFactory = (({ IDL }: { IDL: typeof import('@dfinity/candid').IDL }) => 
     verify_code: IDL.Func([IDL.Text, IDL.Text, IDL.Text, IDL.Text], [VerifyResult], []),
     resend_verification_code: IDL.Func([IDL.Text], [VerifyResult], []),
     get_stats: IDL.Func([], [Stats], ['query']),
+    register_email_password: IDL.Func(
+      [RegisterEmailPasswordRequest],
+      [IDL.Variant({ Ok: AuthResponse, Err: IDL.Text })],
+      []
+    ),
   });
 }) as unknown as IDL.InterfaceFactory;
 
@@ -143,10 +197,25 @@ export function useUserService() {
     return await actor.get_stats();
   };
 
+  /**
+   * Register a new user account with email/password authentication (Story 2.1.2)
+   * @param request - Registration data including encrypted PII and password
+   * @returns Promise with authentication response or error
+   */
+  const registerEmailPassword = async (
+    request: RegisterEmailPasswordRequest
+  ): Promise<{ Ok: AuthResponse } | { Err: string }> => {
+    if (!actor.register_email_password) {
+      throw new Error('register_email_password method not available on canister');
+    }
+    return await actor.register_email_password(request);
+  };
+
   return {
     submitIndividual,
     verifyCode,
     resendVerificationCode,
     getStats,
+    registerEmailPassword,
   };
 }

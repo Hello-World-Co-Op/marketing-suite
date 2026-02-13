@@ -2,15 +2,16 @@ import { Component, type ReactNode, type ErrorInfo } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
 
+import { Suspense, lazy } from 'react';
+
 // Pre-rendered routes are imported directly (not lazy) to avoid hydration
 // mismatches between SSR (synchronous) and client (async with Suspense).
 // This ensures SEO-critical pages hydrate instantly without a loading fallback.
 import LaunchPage from '@/pages/LaunchPage';
 import PrivacyPolicy from '@/pages/PrivacyPolicy';
 
-// Future non-SEO routes can use lazy loading with Suspense:
-// import { Suspense, lazy } from 'react';
-// const FuturePage = lazy(() => import('@/pages/FuturePage'));
+// Non-SEO routes use lazy loading with Suspense
+const Register = lazy(() => import('@/pages/Register'));
 
 // ErrorBoundary component
 class ErrorBoundary extends Component<{ children: ReactNode }, { hasError: boolean }> {
@@ -48,6 +49,14 @@ function App() {
           <Routes>
             <Route path="/" element={<LaunchPage />} />
             <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+            <Route
+              path="/signup"
+              element={
+                <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading...</div>}>
+                  <Register />
+                </Suspense>
+              }
+            />
           </Routes>
         </BrowserRouter>
       </ErrorBoundary>
