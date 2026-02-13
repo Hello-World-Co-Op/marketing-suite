@@ -65,7 +65,8 @@ describe('PrivacyPolicy', () => {
     renderPrivacyPolicy();
 
     const currentYear = new Date().getFullYear().toString();
-    expect(screen.getByText(new RegExp(currentYear))).toBeInTheDocument();
+    const yearElements = screen.getAllByText(new RegExp(currentYear));
+    expect(yearElements.length).toBeGreaterThan(0);
     expect(screen.getByText(/All rights reserved/)).toBeInTheDocument();
   });
 
