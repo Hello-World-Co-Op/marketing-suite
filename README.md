@@ -46,7 +46,8 @@ marketing-suite/
 │   │   ├── LaunchContent/        # 9 content sections (Intro, Video, Ecosystem, etc.)
 │   │   ├── SEO/                  # Reusable SEO component (meta tags, OG, Twitter)
 │   │   ├── ExpandableForm/       # Animated form container for CTA buttons
-│   │   ├── InterestForm/         # Waitlist signup form (name, email, location)
+│   │   ├── InterestForm/         # Waitlist signup form (name, email, DOB, location)
+│   │   ├── DateOfBirthInput/     # Age verification input with COPPA compliance
 │   │   ├── VerificationCodeForm/ # 6-digit email verification
 │   │   ├── LanguageSelector/     # i18n language switcher (EN, ES, FR, PT)
 │   │   └── Select/               # Headless UI accessible select component
@@ -58,7 +59,8 @@ marketing-suite/
 │   ├── utils/
 │   │   ├── crypto.ts             # AES-256-GCM encryption, SHA-256 hashing
 │   │   ├── formTransformers.ts   # Form data to canister request transformer
-│   │   ├── validation.ts         # Zod schemas for form validation
+│   │   ├── validation.ts         # Zod schemas for form validation (including age validation)
+│   │   ├── ageValidation.ts      # DOB validation, under-13 blocking (COPPA)
 │   │   ├── analytics.ts          # PostHog, GA, custom backend tracking
 │   │   ├── toast.ts              # Simple toast notification system
 │   │   ├── i18n.ts               # i18next configuration
@@ -91,8 +93,9 @@ marketing-suite/
 
 - **Sunrise Scroll Animation**: Background gradient transitions from night to day as user scrolls
 - **Waitlist Signup**: Expandable form at multiple CTA points, shared form state to prevent data loss
-- **Client-Side Encryption**: PII encrypted with AES-256-GCM before submission to IC canister
-- **Email Verification**: 6-digit code verification flow
+- **Age Gate & COPPA Compliance**: Date of birth verification, under-13 users blocked from registration
+- **Client-Side Encryption**: PII (including DOB) encrypted with AES-256-GCM before submission to IC canister
+- **Email Verification**: 6-digit code verification flow with automatic NFT minting
 - **Internationalization**: 4 languages (English, Spanish, French, Portuguese)
 - **Accessibility**: WCAG 2.1 AA compliant with proper ARIA attributes
 - **Code Splitting**: Lazy-loaded routes and manual chunks for optimal bundle size
