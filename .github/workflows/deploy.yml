@@ -26,7 +26,7 @@ jobs:
 
       - name: Install dependencies
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.PACKAGES_READ_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.PACKAGES_READ_TOKEN || secrets.GITHUB_TOKEN }}
         run: |
           if [ -f package-lock.json ] && ! grep -q '"link": true' package-lock.json && ! grep -q '"file:' package-lock.json; then
             npm ci
@@ -62,7 +62,7 @@ jobs:
 
       - name: Install dependencies
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.PACKAGES_READ_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.PACKAGES_READ_TOKEN || secrets.GITHUB_TOKEN }}
         run: |
           if [ -f package-lock.json ] && ! grep -q '"link": true' package-lock.json && ! grep -q '"file:' package-lock.json; then
             npm ci
