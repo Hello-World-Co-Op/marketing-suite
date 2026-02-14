@@ -42,8 +42,13 @@ env:
   DFX_WARNING: -mainnet_plaintext_identity
   NODE_VERSION: '20'
   DFX_VERSION: '0.24.3'
-  # Cycle balance warning threshold (2 trillion cycles = 2 TC)
-  CYCLE_WARNING_THRESHOLD: '2000000000000'
+  # Cycle balance warning threshold (0.5 TC = 500 billion cycles)
+  # Adjust as needed based on deployment frequency and canister usage patterns.
+  CYCLE_WARNING_THRESHOLD: '500000000000'
+  # Cycle balance critical threshold (0.1 TC = 100 billion cycles)
+  # Deployment FAILS if balance drops below this to prevent canister from running out.
+  # To top up: dfx ledger top-up <canister-id> --amount <ICP> --network ic
+  CYCLE_CRITICAL_THRESHOLD: '100000000000'
 
 permissions:
   contents: read
@@ -127,8 +132,15 @@ jobs:
           chmod 600 ~/.config/dfx/identity/github-ci/identity.pem
           dfx identity use github-ci
 
-      # Check canister cycle balance before deployment.
-      # Logs a warning if below threshold but does NOT block deployment.
+      # Check canister cycle balance before deployment (FR55).
+      # Logs a warning if below warning threshold (0.5 TC).
+      # FAILS the workflow if below critical threshold (0.1 TC) to prevent
+      # the canister from running out of cycles during or after deployment.
+      #
+      # Cycle top-up procedure:
+      #   dfx ledger top-up <canister-id> --amount <ICP> --network ic
+      # where 1 ICP ~ 1.5 TC at current exchange rates.
+      # Thresholds: 1 TC = 1,000,000,000,000 cycles (1 trillion)
       - name: Check cycle balance
         run: |
           echo "Checking canister cycle balance..."
@@ -140,8 +152,18 @@ jobs:
           BALANCE=$(echo "$STATUS_OUTPUT" | awk '/Balance:/ {gsub(/_/, "", $2); print $2}') || true
           if [ -n "$BALANCE" ]; then
             echo "Current balance: $BALANCE cycles"
+
+            # Critical threshold check — fail workflow if dangerously low
+            if [ "$BALANCE" -lt "${{ env.CYCLE_CRITICAL_THRESHOLD }}" ]; then
+              echo "::error::CRITICAL: Canister cycle balance critically low! ${BALANCE} cycles (critical threshold: ${{ env.CYCLE_CRITICAL_THRESHOLD }})"
+              echo "Top up with: dfx ledger top-up <canister-id> --amount <ICP> --network ic"
+              exit 1
+            fi
+
+            # Warning threshold check — log warning but continue
             if [ "$BALANCE" -lt "${{ env.CYCLE_WARNING_THRESHOLD }}" ]; then
-              echo "::warning::Low cycles: ${BALANCE} cycles (threshold: ${{ env.CYCLE_WARNING_THRESHOLD }})"
+              echo "::warning::Low cycles: ${BALANCE} cycles (warning threshold: ${{ env.CYCLE_WARNING_THRESHOLD }})"
+              echo "Consider topping up: dfx ledger top-up <canister-id> --amount <ICP> --network ic"
             else
               echo "Cycle balance OK: ${BALANCE} cycles"
             fi
