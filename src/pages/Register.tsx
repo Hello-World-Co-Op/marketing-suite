@@ -305,10 +305,10 @@ Generated: ${new Date().toISOString()}
         ip_hash: ipHash ? [ipHash] : [],
         dob_encrypted: dobEncrypted,
         dob_plaintext_for_validation: dobString,
-        company: data.company,
-        job_title: data.jobTitle,
-        interest_area: data.interestArea,
-        referral_source: data.referralSource,
+        company: data.company ? [data.company] : [],
+        job_title: data.jobTitle ? [data.jobTitle] : [],
+        interest_area: data.interestArea ? [data.interestArea] : [],
+        referral_source: data.referralSource ? [data.referralSource] : [],
       });
 
       if ('Ok' in result) {
