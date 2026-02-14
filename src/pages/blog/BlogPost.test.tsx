@@ -32,6 +32,47 @@ vi.mock('@/services/blogCanister', () => ({
 }));
 
 // ============================================================
+// Mock useRelatedPosts (used by PostCTABlock)
+// ============================================================
+
+const mockRelatedPosts: BlogPostType[] = [
+  {
+    id: 10,
+    title: 'Related Post 1',
+    slug: 'related-post-1',
+    body: '<p>Related body</p>',
+    excerpt: 'Related excerpt',
+    authorName: 'Bob',
+    authorRole: 'Author',
+    categories: ['Technology'],
+    tags: ['icp'],
+    featuredImageUrl: null,
+    ogImageUrl: null,
+    publishedAt: Date.now(),
+    createdAt: Date.now(),
+    updatedAt: Date.now(),
+  },
+];
+
+vi.mock('@/hooks/useRelatedPosts', () => ({
+  useRelatedPosts: () => ({
+    relatedPosts: mockRelatedPosts,
+    loading: false,
+    error: null,
+  }),
+}));
+
+// ============================================================
+// Mock clipboard for SocialShareButtons
+// ============================================================
+
+Object.defineProperty(navigator, 'clipboard', {
+  value: { writeText: vi.fn().mockResolvedValue(undefined) },
+  writable: true,
+  configurable: true,
+});
+
+// ============================================================
 // Test data
 // ============================================================
 
@@ -158,8 +199,8 @@ describe('BlogPost', () => {
   it('renders category badges with links', async () => {
     renderBlogPost();
     await waitForPostLoaded();
-    // Get the category link within the article (not in the collapsing header)
-    const article = screen.getByRole('article');
+    // Get the main article (labelledby post-title, not related post cards)
+    const article = screen.getByRole('article', { name: 'Getting Started with ICP' });
     const techLink = article.querySelector('a[href="/blog?category=technology"]');
     expect(techLink).not.toBeNull();
     expect(techLink).toHaveTextContent('Technology');
@@ -168,9 +209,17 @@ describe('BlogPost', () => {
   it('renders tag badges with links', async () => {
     renderBlogPost();
     await waitForPostLoaded();
-    expect(screen.getByText('#icp')).toBeInTheDocument();
-    expect(screen.getByText('#web3')).toBeInTheDocument();
-    expect(screen.getByText('#rust')).toBeInTheDocument();
+    // Scope to main article to avoid duplicates from related post cards
+    const mainArticle = screen.getByRole('article', { name: 'Getting Started with ICP' });
+    const icpTag = mainArticle.querySelector('a[href="/blog?tag=icp"]');
+    const web3Tag = mainArticle.querySelector('a[href="/blog?tag=web3"]');
+    const rustTag = mainArticle.querySelector('a[href="/blog?tag=rust"]');
+    expect(icpTag).not.toBeNull();
+    expect(icpTag).toHaveTextContent('#icp');
+    expect(web3Tag).not.toBeNull();
+    expect(web3Tag).toHaveTextContent('#web3');
+    expect(rustTag).not.toBeNull();
+    expect(rustTag).toHaveTextContent('#rust');
   });
 
   // --- Error state ---
@@ -245,7 +294,8 @@ describe('BlogPost', () => {
   it('uses semantic article element', async () => {
     renderBlogPost();
     await waitForPostLoaded();
-    expect(screen.getByRole('article')).toBeInTheDocument();
+    // Main post article is labelled by post-title
+    expect(screen.getByRole('article', { name: 'Getting Started with ICP' })).toBeInTheDocument();
   });
 
   it('uses semantic main element', async () => {
@@ -277,5 +327,50 @@ describe('BlogPost', () => {
       const header = screen.getByTestId('collapsing-header');
       expect(header).toHaveClass('-translate-y-full');
     });
+  });
+
+  // --- PostCTABlock integration ---
+
+  it('renders PostCTABlock below post content', async () => {
+    renderBlogPost();
+    await waitForPostLoaded();
+    expect(screen.getByTestId('post-cta-block')).toBeInTheDocument();
+  });
+
+  it('PostCTABlock receives correct props (join button links to /signup)', async () => {
+    renderBlogPost();
+    await waitForPostLoaded();
+
+    const joinButton = screen.getByTestId('join-dao-button');
+    expect(joinButton).toHaveAttribute('href', '/signup');
+    expect(joinButton).toHaveTextContent('Join Hello World Co-Op');
+  });
+
+  it('PostCTABlock contains social share buttons', async () => {
+    renderBlogPost();
+    await waitForPostLoaded();
+
+    expect(screen.getByTestId('social-share-buttons')).toBeInTheDocument();
+    expect(screen.getByTestId('share-twitter')).toBeInTheDocument();
+    expect(screen.getByTestId('share-linkedin')).toBeInTheDocument();
+    expect(screen.getByTestId('share-copy-link')).toBeInTheDocument();
+  });
+
+  it('PostCTABlock not rendered when post is loading', () => {
+    mockGetPostBySlug.mockReturnValue(new Promise(() => {})); // hang
+    renderBlogPost();
+
+    expect(screen.queryByTestId('post-cta-block')).not.toBeInTheDocument();
+  });
+
+  it('PostCTABlock not rendered when post has error', async () => {
+    mockGetPostBySlug.mockRejectedValue(new Error('Blog post not found: NotFound'));
+    renderBlogPost('missing-post');
+
+    await waitFor(() => {
+      expect(screen.getByTestId('post-error')).toBeInTheDocument();
+    });
+
+    expect(screen.queryByTestId('post-cta-block')).not.toBeInTheDocument();
   });
 });

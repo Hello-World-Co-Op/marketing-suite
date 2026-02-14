@@ -18,6 +18,7 @@ import { useParams, Link } from 'react-router-dom';
 import { SEO } from '@/components/SEO/SEO';
 import PostContent from '@/components/blog/PostContent';
 import AuthorByline from '@/components/blog/AuthorByline';
+import PostCTABlock from '@/components/blog/PostCTABlock';
 import { useBlogPost } from '@/hooks/useBlogPost';
 
 // ============================================================
@@ -304,6 +305,14 @@ export default function BlogPost() {
 
             {/* Suggest a correction */}
             <SuggestCorrection title={post.title} slug={post.slug} />
+
+            {/* Post-article CTA block: related posts, join button, social share */}
+            <PostCTABlock
+              currentPostSlug={post.slug}
+              currentCategorySlug={post.categories[0]?.toLowerCase()}
+              postTitle={post.title}
+              postUrl={`https://www.helloworlddao.com/blog/${post.slug}`}
+            />
           </article>
         )}
       </main>
