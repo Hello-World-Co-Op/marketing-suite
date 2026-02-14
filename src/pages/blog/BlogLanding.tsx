@@ -90,8 +90,8 @@ export default function BlogLanding() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Read filter state from URL
-  const activeCategory = searchParams.get('category');
+  // Read filter state from URL (normalize category to lowercase for case-insensitive matching)
+  const activeCategory = searchParams.get('category')?.toLowerCase() || null;
   const activeTag = searchParams.get('tag');
 
   const fetchData = useCallback(async () => {

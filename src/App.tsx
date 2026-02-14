@@ -9,10 +9,10 @@ import { Suspense, lazy } from 'react';
 // This ensures SEO-critical pages hydrate instantly without a loading fallback.
 import LaunchPage from '@/pages/LaunchPage';
 import PrivacyPolicy from '@/pages/PrivacyPolicy';
+import BlogLanding from '@/pages/blog/BlogLanding';
 
 // Non-SEO routes use lazy loading with Suspense
 const Register = lazy(() => import('@/pages/Register'));
-const BlogLanding = lazy(() => import('@/pages/blog/BlogLanding'));
 
 // ErrorBoundary component
 class ErrorBoundary extends Component<{ children: ReactNode }, { hasError: boolean }> {
@@ -58,14 +58,7 @@ function App() {
                 </Suspense>
               }
             />
-            <Route
-              path="/blog"
-              element={
-                <Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-slate-900">Loading...</div>}>
-                  <BlogLanding />
-                </Suspense>
-              }
-            />
+            <Route path="/blog" element={<BlogLanding />} />
           </Routes>
         </BrowserRouter>
       </ErrorBoundary>

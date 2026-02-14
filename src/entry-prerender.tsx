@@ -13,6 +13,7 @@ import { HelmetProvider } from 'react-helmet-async';
 import { Routes, Route } from 'react-router-dom';
 import LaunchPage from './pages/LaunchPage';
 import PrivacyPolicy from './pages/PrivacyPolicy';
+import BlogLanding from './pages/blog/BlogLanding';
 
 /**
  * Render a given URL path to static HTML string.
@@ -28,6 +29,7 @@ export function render(url: string) {
         <Routes>
           <Route path="/" element={<LaunchPage />} />
           <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+          <Route path="/blog" element={<BlogLanding />} />
         </Routes>
       </StaticRouter>
     </HelmetProvider>,
@@ -39,4 +41,4 @@ export function render(url: string) {
 }
 
 /** Routes to pre-render at build time */
-export const routes = ['/', '/privacy-policy'];
+export const routes = ['/', '/privacy-policy', '/blog'];
