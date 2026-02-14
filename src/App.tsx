@@ -13,6 +13,7 @@ import BlogLanding from '@/pages/blog/BlogLanding';
 
 // Non-SEO routes use lazy loading with Suspense
 const Register = lazy(() => import('@/pages/Register'));
+const BlogPost = lazy(() => import('@/pages/blog/BlogPost'));
 
 // ErrorBoundary component
 class ErrorBoundary extends Component<{ children: ReactNode }, { hasError: boolean }> {
@@ -59,6 +60,14 @@ function App() {
               }
             />
             <Route path="/blog" element={<BlogLanding />} />
+            <Route
+              path="/blog/:slug"
+              element={
+                <Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-slate-900">Loading...</div>}>
+                  <BlogPost />
+                </Suspense>
+              }
+            />
           </Routes>
         </BrowserRouter>
       </ErrorBoundary>

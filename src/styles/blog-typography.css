@@ -1,0 +1,260 @@
+/**
+ * Blog Typography Styles
+ * Shared between marketing-suite (public blog) and dao-admin-suite (editor preview)
+ * Scoped under .blog-content to avoid conflicts with existing styles
+ *
+ * Design specs:
+ * - Base: 18px font-size, Inter/system-ui, line-height 1.65
+ * - Max-width: 700px for optimal reading
+ * - Dark mode support via prefers-color-scheme
+ */
+
+/* CSS Custom Properties for theme consistency */
+:root {
+  --blog-max-width: 700px;
+  --blog-font-size: 18px;
+  --blog-line-height: 1.65;
+  --blog-font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --blog-text-color: #1a1a2e;
+  --blog-heading-color: #0f0f1a;
+  --blog-link-color: #2563eb;
+  --blog-link-hover-color: #1d4ed8;
+  --blog-border-color: #e2e8f0;
+  --blog-blockquote-bg: #f8fafc;
+  --blog-code-bg: #1e293b;
+  --blog-code-text: #e2e8f0;
+  --blog-inline-code-bg: #f1f5f9;
+  --blog-inline-code-text: #334155;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --blog-text-color: #e2e8f0;
+    --blog-heading-color: #f1f5f9;
+    --blog-link-color: #60a5fa;
+    --blog-link-hover-color: #93bbfd;
+    --blog-border-color: #334155;
+    --blog-blockquote-bg: #1e293b;
+    --blog-code-bg: #0f172a;
+    --blog-code-text: #e2e8f0;
+    --blog-inline-code-bg: #1e293b;
+    --blog-inline-code-text: #cbd5e1;
+  }
+}
+
+/* Base typography container */
+.blog-content {
+  max-width: var(--blog-max-width);
+  margin: 0 auto;
+  font-family: var(--blog-font-family);
+  font-size: var(--blog-font-size);
+  line-height: var(--blog-line-height);
+  color: var(--blog-text-color);
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+/* Headings */
+.blog-content h1 {
+  font-size: 2.25em;
+  font-weight: 800;
+  line-height: 1.2;
+  margin-top: 2em;
+  margin-bottom: 0.75em;
+  color: var(--blog-heading-color);
+  letter-spacing: -0.025em;
+}
+
+.blog-content h2 {
+  font-size: 1.75em;
+  font-weight: 700;
+  line-height: 1.3;
+  margin-top: 1.75em;
+  margin-bottom: 0.65em;
+  color: var(--blog-heading-color);
+  letter-spacing: -0.02em;
+}
+
+.blog-content h3 {
+  font-size: 1.375em;
+  font-weight: 600;
+  line-height: 1.35;
+  margin-top: 1.5em;
+  margin-bottom: 0.5em;
+  color: var(--blog-heading-color);
+}
+
+.blog-content h4 {
+  font-size: 1.125em;
+  font-weight: 600;
+  line-height: 1.4;
+  margin-top: 1.25em;
+  margin-bottom: 0.5em;
+  color: var(--blog-heading-color);
+}
+
+.blog-content h5 {
+  font-size: 1em;
+  font-weight: 600;
+  line-height: 1.5;
+  margin-top: 1.25em;
+  margin-bottom: 0.5em;
+  color: var(--blog-heading-color);
+}
+
+.blog-content h6 {
+  font-size: 0.875em;
+  font-weight: 600;
+  line-height: 1.5;
+  margin-top: 1.25em;
+  margin-bottom: 0.5em;
+  color: var(--blog-heading-color);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Paragraphs */
+.blog-content p {
+  margin-bottom: 1.25em;
+}
+
+/* Links */
+.blog-content a {
+  color: var(--blog-link-color);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  transition: color 0.15s ease;
+}
+
+.blog-content a:hover {
+  color: var(--blog-link-hover-color);
+}
+
+/* Lists */
+.blog-content ul {
+  list-style-type: disc;
+  padding-left: 1.75em;
+  margin-bottom: 1.25em;
+}
+
+.blog-content ol {
+  list-style-type: decimal;
+  padding-left: 1.75em;
+  margin-bottom: 1.25em;
+}
+
+.blog-content li {
+  margin-bottom: 0.5em;
+  padding-left: 0.25em;
+}
+
+.blog-content li > ul,
+.blog-content li > ol {
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+}
+
+/* Blockquotes */
+.blog-content blockquote {
+  border-left: 4px solid var(--blog-link-color);
+  padding: 1em 1.5em;
+  margin: 1.5em 0;
+  background-color: var(--blog-blockquote-bg);
+  border-radius: 0 0.375rem 0.375rem 0;
+  font-style: italic;
+}
+
+.blog-content blockquote p:last-child {
+  margin-bottom: 0;
+}
+
+/* Code blocks (dark theme) */
+.blog-content pre {
+  background-color: var(--blog-code-bg);
+  color: var(--blog-code-text);
+  padding: 1.25em 1.5em;
+  border-radius: 0.5rem;
+  overflow-x: auto;
+  margin: 1.5em 0;
+  font-size: 0.875em;
+  line-height: 1.7;
+  font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
+}
+
+.blog-content pre code {
+  background: none;
+  padding: 0;
+  color: inherit;
+  font-size: inherit;
+  border-radius: 0;
+}
+
+/* Inline code */
+.blog-content code {
+  background-color: var(--blog-inline-code-bg);
+  color: var(--blog-inline-code-text);
+  padding: 0.15em 0.4em;
+  border-radius: 0.25rem;
+  font-size: 0.875em;
+  font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
+}
+
+/* Images */
+.blog-content img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 0.5rem;
+  margin: 1.5em 0;
+}
+
+/* Horizontal rule */
+.blog-content hr {
+  border: none;
+  border-top: 1px solid var(--blog-border-color);
+  margin: 2em 0;
+}
+
+/* Tables */
+.blog-content table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.5em 0;
+  font-size: 0.9375em;
+}
+
+.blog-content th,
+.blog-content td {
+  border: 1px solid var(--blog-border-color);
+  padding: 0.75em 1em;
+  text-align: left;
+}
+
+.blog-content th {
+  font-weight: 600;
+  background-color: var(--blog-blockquote-bg);
+}
+
+/* First heading removes top margin */
+.blog-content > h1:first-child,
+.blog-content > h2:first-child,
+.blog-content > h3:first-child {
+  margin-top: 0;
+}
+
+/* Full-bleed code blocks on mobile */
+@media (max-width: 640px) {
+  .blog-content pre {
+    margin-left: -1rem;
+    margin-right: -1rem;
+    border-radius: 0;
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+}
+
+/* Focus indicators for interactive elements (WCAG 2.1 AA - NFR24) */
+.blog-content a:focus-visible {
+  outline: 2px solid #60a5fa;
+  outline-offset: 2px;
+  border-radius: 2px;
+}
