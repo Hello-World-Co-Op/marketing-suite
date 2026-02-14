@@ -24,6 +24,7 @@ interface SitemapRoute {
 const routes: SitemapRoute[] = [
   { path: '/', changefreq: 'weekly', priority: 1.0 },
   { path: '/privacy-policy', changefreq: 'monthly', priority: 0.5 },
+  { path: '/blog', changefreq: 'daily', priority: 0.8 },
 ];
 
 // Note: lastmod is set to build date (not actual file modification date).
