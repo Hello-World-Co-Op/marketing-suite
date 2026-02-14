@@ -56,7 +56,13 @@ export default function PostCTABlock({
 
       {/* Loading skeleton for related posts */}
       {loading && (
-        <div className="mb-10" data-testid="related-posts-loading">
+        <div
+          className="mb-10"
+          data-testid="related-posts-loading"
+          aria-live="polite"
+          aria-busy="true"
+        >
+          <span className="sr-only">Loading related posts...</span>
           <div className="h-8 w-48 bg-slate-700 rounded mb-4 animate-pulse" />
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {[1, 2, 3].map((i) => (

@@ -48,7 +48,7 @@ export function useRelatedPosts(
       setError(null);
       try {
         // Fetch all published posts (sorted by publishedAt descending)
-        const allPosts = await listPosts(1, 50);
+        const allPosts = await listPosts(1, 15);
 
         if (cancelled) return;
 
