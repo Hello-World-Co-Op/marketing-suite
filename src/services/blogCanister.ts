@@ -126,10 +126,26 @@ const CategoryResponseType = IDL.Record({
   post_count: IDL.Nat64,
 });
 
+const ListPostsInputType = IDL.Record({
+  page: IDL.Nat32,
+  page_size: IDL.Nat32,
+});
+
+const PaginatedPostResultType = IDL.Record({
+  items: IDL.Vec(PostResponseType),
+  total: IDL.Nat64,
+  page: IDL.Nat32,
+  page_size: IDL.Nat32,
+});
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const idlFactory = ({ IDL: _IDL }: { IDL: any }) => {
   return IDL.Service({
-    list_posts: IDL.Func([], [IDL.Vec(PostResponseType)], ['query']),
+    list_posts: IDL.Func(
+      [ListPostsInputType],
+      [IDL.Variant({ Ok: PaginatedPostResultType, Err: BlogErrorVariant })],
+      ['query'],
+    ),
     list_categories: IDL.Func([], [IDL.Vec(CategoryResponseType)], ['query']),
     get_post_by_slug: IDL.Func(
       [IDL.Text],
@@ -147,7 +163,8 @@ let _actor: ActorSubclass | null = null;
 
 function getAgent(): HttpAgent {
   const host = import.meta.env.VITE_IC_HOST || 'https://ic0.app';
-  return HttpAgent.create({ host }) as unknown as HttpAgent;
+  // HttpAgent.createSync avoids the async Promise issue with HttpAgent.create in @dfinity/agent v3.x
+  return HttpAgent.createSync({ host });
 }
 
 function getActor(): ActorSubclass {
@@ -219,12 +236,18 @@ export function normalizeCategory(raw: CategoryResponse): BlogCategory {
 // ============================================================
 
 /**
- * Fetch all published blog posts (anonymous query).
+ * Fetch published blog posts with pagination (anonymous query).
  * Returns posts sorted by published_at descending.
  */
-export async function listPosts(): Promise<BlogPost[]> {
+export async function listPosts(page = 1, pageSize = 50): Promise<BlogPost[]> {
   const actor = getActor();
-  const rawPosts = (await actor.list_posts()) as PostResponse[];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const result = (await actor.list_posts({ page, page_size: pageSize })) as any;
+  if ('Err' in result) {
+    const errKey = Object.keys(result.Err)[0];
+    throw new Error(`Failed to fetch posts: ${errKey}`);
+  }
+  const rawPosts = result.Ok.items as PostResponse[];
   const posts = rawPosts.map(normalizePost);
   // Sort by publishedAt descending (most recent first)
   posts.sort((a, b) => b.publishedAt - a.publishedAt);
