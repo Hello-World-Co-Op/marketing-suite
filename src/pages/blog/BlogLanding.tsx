@@ -173,6 +173,8 @@ export default function BlogLanding() {
         title="Blog - Hello World Co-Op DAO"
         description="Insights, updates, and stories from the Hello World Co-Op community"
         url="https://www.helloworlddao.com/blog"
+        rssUrl="/blog/rss.xml"
+        rssTitle="Hello World DAO Blog"
       />
 
       <div className="max-w-4xl mx-auto px-4 py-12">

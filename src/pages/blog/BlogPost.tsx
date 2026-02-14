@@ -182,7 +182,9 @@ export default function BlogPost() {
     : 'Blog Post - Hello World Co-Op';
   const pageDescription = post?.excerpt || 'Read this blog post from the Hello World Co-Op community.';
   const pageUrl = slug ? `https://www.helloworlddao.com/blog/${slug}` : undefined;
-  const ogImage = post?.ogImageUrl || post?.featuredImageUrl || undefined;
+  // Fallback OG image: post OG image > featured image > blog-specific default (FR46)
+  const BLOG_OG_FALLBACK = 'https://www.helloworlddao.com/assets/blog-og-default.png';
+  const ogImage = post?.ogImageUrl || post?.featuredImageUrl || BLOG_OG_FALLBACK;
 
   return (
     <div className="min-h-screen bg-slate-900">
@@ -192,6 +194,8 @@ export default function BlogPost() {
         url={pageUrl}
         type="article"
         image={ogImage}
+        rssUrl="/blog/rss.xml"
+        rssTitle="Hello World DAO Blog"
       />
 
       {/* Skip to content link for keyboard navigation */}

@@ -32,6 +32,10 @@ export interface SEOProps {
   image?: string;
   /** Twitter card type (default: 'summary_large_image') */
   twitterCard?: 'summary' | 'summary_large_image';
+  /** RSS feed URL for auto-discovery (adds <link rel="alternate" type="application/rss+xml">) */
+  rssUrl?: string;
+  /** RSS feed title for auto-discovery link tag */
+  rssTitle?: string;
 }
 
 const SITE_NAME = 'Hello World Co-Op';
@@ -44,6 +48,8 @@ export function SEO({
   type = 'website',
   image = DEFAULT_IMAGE,
   twitterCard = 'summary_large_image',
+  rssUrl,
+  rssTitle = 'Hello World DAO Blog',
 }: SEOProps) {
   return (
     <Helmet>
@@ -68,6 +74,11 @@ export function SEO({
 
       {/* Canonical URL */}
       {url && <link rel="canonical" href={url} />}
+
+      {/* RSS Feed Auto-Discovery */}
+      {rssUrl && (
+        <link rel="alternate" type="application/rss+xml" title={rssTitle} href={rssUrl} />
+      )}
 
       {/* Future enhancement: Add structured data (JSON-LD) here for rich search results
        * Example: Organization schema, WebSite schema, BreadcrumbList

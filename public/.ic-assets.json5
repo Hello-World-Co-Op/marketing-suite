@@ -1,0 +1,32 @@
+// IC Asset Canister configuration
+// Controls how assets are served, including content types and caching headers.
+// Ensures static XML files (RSS, sitemap) are served directly and not
+// intercepted by the SPA fallback to index.html.
+// See: https://internetcomputer.org/docs/current/developer-docs/frontend/custom-frontend
+[
+  {
+    // Serve RSS feed as XML with correct content type (prevent SPA fallback)
+    "match": "blog/rss.xml",
+    "headers": {
+      "Content-Type": "application/rss+xml; charset=utf-8",
+      "Cache-Control": "public, max-age=3600"
+    },
+    "allow_raw_access": true
+  },
+  {
+    // Serve sitemap as XML with correct content type
+    "match": "blog/sitemap.xml",
+    "headers": {
+      "Content-Type": "application/xml; charset=utf-8",
+      "Cache-Control": "public, max-age=3600"
+    },
+    "allow_raw_access": true
+  },
+  {
+    // Default SPA fallback for all other paths
+    "match": "**/*",
+    "headers": {
+      "X-Content-Type-Options": "nosniff"
+    }
+  }
+]
