@@ -76,11 +76,11 @@ export interface RegisterEmailPasswordRequest {
   // BL-011.2: DOB fields for COPPA compliance
   dob_encrypted: string;
   dob_plaintext_for_validation: string;
-  // FOS-3.3.1: Optional CRM fields for lead tracking
-  company?: string;
-  job_title?: string;
-  interest_area?: string;
-  referral_source?: string;
+  // FOS-3.3.1: Optional CRM fields for lead tracking (Candid opt encoding)
+  company: [string] | [];
+  job_title: [string] | [];
+  interest_area: [string] | [];
+  referral_source: [string] | [];
 }
 
 // Authentication response from user-service
