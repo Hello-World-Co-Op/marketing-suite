@@ -1,0 +1,164 @@
+# Blog Pre-Rendering Workflow
+#
+# Generates static SEO metadata (HTML shells, RSS feed, sitemap) for blog
+# posts by querying the blog canister on IC mainnet, then deploys the
+# updated assets to the marketing-suite asset canister.
+#
+# Trigger: repository_dispatch event (type: blog-rebuild) from oracle-bridge
+#          webhook (BL-008.6.1), or manual workflow_dispatch.
+#
+# Story: BL-008.6.2
+
+name: Blog Pre-Render & Deploy
+
+on:
+  repository_dispatch:
+    types: [blog-rebuild]
+  workflow_dispatch:
+    inputs:
+      reason:
+        description: 'Reason for manual trigger'
+        required: false
+        default: 'Manual blog rebuild'
+
+# Prevent parallel deployments — only one deploy at a time.
+# New dispatches cancel older in-progress runs. (FR51, NFR21)
+concurrency:
+  group: marketing-suite-deploy
+  cancel-in-progress: true
+
+# Workflow-level environment variables
+env:
+  BLOG_CANISTER_ID: dsqvo-niaaa-aaaao-a6ynq-cai
+  IC_NETWORK: ic
+  DFX_NETWORK: ic
+  DFX_WARNING: -mainnet_plaintext_identity
+  NODE_VERSION: '20'
+  DFX_VERSION: '0.24.3'
+  # Cycle balance warning threshold (2 trillion cycles = 2 TC)
+  CYCLE_WARNING_THRESHOLD: '2000000000000'
+
+permissions:
+  contents: read
+
+jobs:
+  pre-render-and-deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      # ============================================================
+      # Setup
+      # ============================================================
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      # ============================================================
+      # Build marketing-suite (Vite build + prerender + sitemap)
+      # This produces the base dist/ directory that we augment with
+      # blog metadata files.
+      # ============================================================
+      - name: Build marketing-suite
+        run: npm run build
+
+      # ============================================================
+      # Fetch blog metadata from IC mainnet canister
+      # ============================================================
+      - name: Fetch blog metadata
+        run: node scripts/blog/fetch-metadata.mjs
+        env:
+          BLOG_CANISTER_ID: ${{ env.BLOG_CANISTER_ID }}
+
+      # ============================================================
+      # Generate blog SEO assets (HTML shells, RSS, sitemap)
+      # These scripts must run sequentially — they depend on
+      # dist/blog-metadata.json from the fetch step.
+      # ============================================================
+      - name: Generate HTML shells
+        run: node scripts/blog/generate-html-shells.mjs
+
+      - name: Generate RSS feed
+        run: node scripts/blog/generate-rss.mjs
+
+      - name: Generate sitemap (merged)
+        run: node scripts/blog/generate-sitemap.mjs
+
+      # ============================================================
+      # Setup dfx and deploy to IC mainnet
+      # ============================================================
+      - name: Install dfx
+        uses: dfinity/setup-dfx@main
+        with:
+          dfx-version: ${{ env.DFX_VERSION }}
+
+      - name: Configure dfx identity
+        run: |
+          mkdir -p ~/.config/dfx/identity/github-ci
+          echo "${{ secrets.DFX_IDENTITY_PEM }}" > ~/.config/dfx/identity/github-ci/identity.pem
+          chmod 600 ~/.config/dfx/identity/github-ci/identity.pem
+          dfx identity use github-ci
+
+      # Check canister cycle balance before deployment.
+      # Logs a warning if below threshold but does NOT block deployment.
+      - name: Check cycle balance
+        run: |
+          echo "Checking canister cycle balance..."
+          STATUS_OUTPUT=$(dfx canister status marketing_suite_assets --network ic 2>&1) || true
+          echo "$STATUS_OUTPUT"
+
+          # Extract cycle balance (format: "Balance: 1_234_567_890_123 Cycles")
+          BALANCE=$(echo "$STATUS_OUTPUT" | grep -oP 'Balance:\s+\K[0-9_]+(?=\s+Cycles)' | tr -d '_') || true
+          if [ -n "$BALANCE" ]; then
+            echo "Current balance: $BALANCE cycles"
+            if [ "$BALANCE" -lt "${{ env.CYCLE_WARNING_THRESHOLD }}" ]; then
+              echo "::warning::Low cycles: ${BALANCE} cycles (threshold: ${{ env.CYCLE_WARNING_THRESHOLD }})"
+            else
+              echo "Cycle balance OK: ${BALANCE} cycles"
+            fi
+          else
+            echo "::warning::Could not determine cycle balance from canister status output"
+          fi
+
+      # Deploy to IC mainnet with upgrade mode; fall back to reinstall
+      # if upgrade fails (e.g., stable memory corruption from dfx version mismatch).
+      - name: Deploy to IC mainnet
+        run: |
+          echo "Deploying marketing-suite to IC mainnet..."
+          if dfx deploy marketing_suite_assets --network ic --mode upgrade; then
+            echo "Deployment successful (upgrade mode)"
+          else
+            echo "::warning::Upgrade failed — retrying with --mode reinstall"
+            dfx deploy marketing_suite_assets --network ic --mode reinstall
+            echo "Deployment successful (reinstall mode)"
+          fi
+
+      # ============================================================
+      # Cleanup — always run, even on failure (AI-056)
+      # ============================================================
+      - name: Cleanup identity PEM
+        if: always()
+        run: |
+          rm -f ~/.config/dfx/identity/github-ci/identity.pem
+          echo "Identity PEM cleaned up"
+
+      - name: Summary
+        if: success()
+        run: |
+          echo "## Blog Pre-Render Complete" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- **Trigger:** ${{ github.event_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Blog Canister:** ${{ env.BLOG_CANISTER_ID }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Network:** ${{ env.IC_NETWORK }}" >> $GITHUB_STEP_SUMMARY
+          if [ -f dist/blog-metadata.json ]; then
+            POST_COUNT=$(node -e "console.log(JSON.parse(require('fs').readFileSync('dist/blog-metadata.json','utf-8')).length)")
+            echo "- **Posts processed:** ${POST_COUNT}" >> $GITHUB_STEP_SUMMARY
+          fi

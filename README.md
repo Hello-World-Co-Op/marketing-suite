@@ -76,7 +76,13 @@ marketing-suite/
 │   └── index.css                 # Global styles and Tailwind config
 ├── scripts/
 │   ├── prerender.ts              # Build-time static HTML pre-rendering
-│   └── generate-sitemap.ts       # Build-time sitemap.xml generation
+│   ├── generate-sitemap.ts       # Build-time sitemap.xml generation
+│   └── blog/                     # Blog pre-rendering pipeline scripts
+│       ├── fetch-metadata.mjs    # Query blog canister for post metadata
+│       ├── generate-html-shells.mjs  # Generate per-post SEO HTML shells
+│       ├── generate-rss.mjs      # Generate RSS 2.0 feed
+│       ├── generate-sitemap.mjs  # Generate merged sitemap (static + blog)
+│       └── __tests__/            # Unit tests for blog scripts
 ├── public/
 │   ├── locales/                  # i18n translation files (en, es, fr, pt)
 │   ├── robots.txt                # Search engine crawler directives
@@ -100,6 +106,7 @@ marketing-suite/
 - **Accessibility**: WCAG 2.1 AA compliant with proper ARIA attributes
 - **Code Splitting**: Lazy-loaded routes and manual chunks for optimal bundle size
 - **SEO Pre-rendering**: Static HTML generation at build time for search engine indexing
+- **Blog Pre-rendering Pipeline**: GitHub Actions workflow generates per-post HTML shells with SEO metadata, RSS feed, and sitemap from blog canister data
 
 ## Environment Variables
 
@@ -123,7 +130,7 @@ Total gzipped JS: ~353 KB (split across lazy-loaded chunks)
 
 ## Testing
 
-### Unit Tests (Vitest) - 83 tests
+### Unit Tests (Vitest) - 368 tests
 
 ```bash
 npm test                  # Run once
@@ -161,6 +168,11 @@ After `npm run build`, the dist/ directory contains:
 - `dist/robots.txt` - Crawler directives (from public/)
 - `dist/og-image.png` - Open Graph social sharing image
 
+After the blog pre-rendering pipeline runs (via GitHub Actions), additional files are added:
+- `dist/blog/[slug]/index.html` - Per-post HTML shells with SEO metadata
+- `dist/blog/rss.xml` - RSS 2.0 feed (last 20 published posts)
+- `dist/sitemap.xml` - Merged sitemap (static + blog post URLs)
+
 ### Adding SEO to a New Page
 
 1. Import the SEO component:
@@ -187,6 +199,52 @@ Each page includes:
 - `<meta property="og:*">` - Open Graph tags (title, description, image, url, type, site_name)
 - `<meta name="twitter:*">` - Twitter Card tags (card, title, description, image)
 - `<link rel="canonical">` - Canonical URL
+
+## Blog Pre-Rendering Pipeline
+
+The blog pre-rendering pipeline generates SEO-optimized assets from the blog canister data, deployed via GitHub Actions.
+
+### How It Works
+
+1. **Trigger**: `repository_dispatch` event (type: `blog-rebuild`) from oracle-bridge webhook, or manual `workflow_dispatch`
+2. **Fetch**: Queries blog canister `get_posts_metadata()` anonymously on IC mainnet using `@dfinity/agent`
+3. **Generate**: Creates per-post HTML shells, RSS feed, and merged sitemap
+4. **Deploy**: Deploys updated dist/ to IC marketing-suite asset canister
+
+### Workflow File
+
+`.github/workflows/blog-pre-render.yml`
+
+### Workflow Variables
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `BLOG_CANISTER_ID` | Blog canister ID on IC mainnet | `dsqvo-niaaa-aaaao-a6ynq-cai` |
+| `IC_NETWORK` | IC network to deploy to | `ic` |
+| `CYCLE_WARNING_THRESHOLD` | Cycle balance warning threshold | `2000000000000` (2 TC) |
+
+### Required Secrets
+
+| Secret | Description |
+|--------|-------------|
+| `DFX_IDENTITY_PEM` | PEM file for `github-ci` dfx identity (controller of marketing-suite asset canister) |
+
+### Scripts
+
+| Script | Purpose |
+|--------|---------|
+| `scripts/blog/fetch-metadata.mjs` | Query blog canister for post metadata |
+| `scripts/blog/generate-html-shells.mjs` | Generate per-post `/blog/[slug]/index.html` with OG tags and JSON-LD |
+| `scripts/blog/generate-rss.mjs` | Generate RSS 2.0 feed at `/blog/rss.xml` (last 20 posts) |
+| `scripts/blog/generate-sitemap.mjs` | Generate merged sitemap at `/sitemap.xml` (static + blog URLs) |
+
+### Troubleshooting
+
+- **Candid decode error**: Ensure `BLOG_CANISTER_ID` is correct and the canister is running on IC mainnet
+- **Cycle balance warning**: Top up cycles with `dfx canister deposit-cycles <amount> marketing_suite_assets --network ic`
+- **Deployment failure (upgrade)**: Workflow automatically falls back to `--mode reinstall` if upgrade fails
+- **No posts generated**: Verify blog canister has published posts (call `get_posts_metadata` directly)
+- **Identity PEM issues**: Ensure `DFX_IDENTITY_PEM` repo secret contains the full PEM file content (not a path)
 
 ## Deployment
 
