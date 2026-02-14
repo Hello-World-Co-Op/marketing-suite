@@ -26,6 +26,53 @@ const SITE_NAME = 'Hello World Co-Op';
 const FALLBACK_OG_IMAGE = `${HOSTNAME}/og-image.png`;
 
 /**
+ * Validate slug format to prevent XSS and path traversal attacks.
+ * Slugs must be lowercase alphanumeric with hyphens only.
+ *
+ * @param {string} slug - Post slug from canister
+ * @returns {string} Validated slug
+ * @throws {Error} If slug contains invalid characters
+ */
+export function validateSlug(slug) {
+  if (!slug || typeof slug !== 'string') {
+    throw new Error('Slug is required and must be a string');
+  }
+
+  // Reject path traversal attempts
+  if (slug.includes('..') || slug.includes('/') || slug.includes('\\')) {
+    throw new Error(`Invalid slug (path traversal): ${slug}`);
+  }
+
+  // Validate against safe slug pattern
+  if (!/^[a-z0-9-]+$/.test(slug)) {
+    throw new Error(`Invalid slug format (must be lowercase alphanumeric with hyphens): ${slug}`);
+  }
+
+  return slug;
+}
+
+/**
+ * Validate URL format to prevent javascript: protocol injection.
+ *
+ * @param {string|null} url - URL to validate
+ * @returns {string|null} Validated URL or null if invalid
+ */
+export function validateUrl(url) {
+  if (!url) return null;
+  try {
+    const parsed = new URL(url);
+    if (!['http:', 'https:'].includes(parsed.protocol)) {
+      console.warn(`Invalid URL protocol: ${url}`);
+      return null;
+    }
+    return url;
+  } catch {
+    console.warn(`Invalid URL format: ${url}`);
+    return null;
+  }
+}
+
+/**
  * Escape HTML entities to prevent XSS in meta tag values.
  *
  * @param {string} str - Raw string
@@ -62,13 +109,14 @@ export function nanosToIso(nanos) {
 export function generateJsonLd(post) {
   const publishedDate = nanosToIso(post.published_at);
   const modifiedDate = nanosToIso(post.updated_at);
+  const safeSlug = validateSlug(post.slug);
 
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'Article',
     headline: post.title,
     description: post.excerpt,
-    image: post.og_image_url || post.featured_image_url || FALLBACK_OG_IMAGE,
+    image: validateUrl(post.og_image_url) || validateUrl(post.featured_image_url) || FALLBACK_OG_IMAGE,
     author: {
       '@type': 'Person',
       name: post.author_name,
@@ -81,10 +129,10 @@ export function generateJsonLd(post) {
         url: `${HOSTNAME}/og-image.png`,
       },
     },
-    url: `${HOSTNAME}/blog/${post.slug}`,
+    url: `${HOSTNAME}/blog/${safeSlug}`,
     mainEntityOfPage: {
       '@type': 'WebPage',
-      '@id': `${HOSTNAME}/blog/${post.slug}`,
+      '@id': `${HOSTNAME}/blog/${safeSlug}`,
     },
   };
 
@@ -105,10 +153,11 @@ export function generateJsonLd(post) {
  * @returns {string} Complete HTML document
  */
 export function generateHtmlShell(post) {
+  const safeSlug = validateSlug(post.slug);
   const title = escapeHtml(post.title);
   const description = escapeHtml(post.excerpt);
-  const url = `${HOSTNAME}/blog/${post.slug}`;
-  const ogImage = post.og_image_url || post.featured_image_url || FALLBACK_OG_IMAGE;
+  const url = `${HOSTNAME}/blog/${safeSlug}`;
+  const ogImage = validateUrl(post.og_image_url) || validateUrl(post.featured_image_url) || FALLBACK_OG_IMAGE;
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -141,7 +190,7 @@ export function generateHtmlShell(post) {
     <script>
       // SPA redirect: load the full application for client-side rendering
       if (!window.__PRERENDERED__) {
-        window.location.replace('/blog/${post.slug}');
+        window.location.replace('/blog/${safeSlug}');
       }
     </script>
   </body>
@@ -175,11 +224,17 @@ async function main() {
 
   let count = 0;
   for (const post of publishedPosts) {
-    const html = generateHtmlShell(post);
-    const outDir = resolve(DIST, 'blog', post.slug);
-    await mkdir(outDir, { recursive: true });
-    await writeFile(resolve(outDir, 'index.html'), html, 'utf-8');
-    count++;
+    try {
+      const html = generateHtmlShell(post);
+      const safeSlug = validateSlug(post.slug);
+      const outDir = resolve(DIST, 'blog', safeSlug);
+      await mkdir(outDir, { recursive: true });
+      await writeFile(resolve(outDir, 'index.html'), html, 'utf-8');
+      count++;
+    } catch (err) {
+      console.error(`Failed to generate HTML shell for post ${post.id} (${post.slug}):`, err.message);
+      process.exit(1);
+    }
   }
 
   console.log(`HTML shells generated: ${count} files in dist/blog/`);

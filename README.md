@@ -130,7 +130,7 @@ Total gzipped JS: ~353 KB (split across lazy-loaded chunks)
 
 ## Testing
 
-### Unit Tests (Vitest) - 368 tests
+### Unit Tests (Vitest) - 382 tests
 
 ```bash
 npm test                  # Run once

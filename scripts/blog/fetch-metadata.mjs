@@ -118,8 +118,11 @@ async function main() {
     const responseSize = Buffer.byteLength(jsonStr, 'utf-8');
     if (responseSize > MAX_RESPONSE_BYTES) {
       console.error(
-        `Warning: Response size (${(responseSize / 1024 / 1024).toFixed(2)} MB) exceeds 2MB boundary node limit.`
+        `ERROR: Response size (${(responseSize / 1024 / 1024).toFixed(2)} MB) exceeds 2MB boundary node limit.`
       );
+      console.error('Blog canister must implement pagination to stay under 2MB limit.');
+      console.error(`Canister returned ${metadata.length} posts. Consider reducing post count or implementing pagination.`);
+      process.exit(1);
     }
 
     await mkdir(DIST, { recursive: true });

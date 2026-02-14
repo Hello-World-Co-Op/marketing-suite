@@ -9,7 +9,7 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import { generateHtmlShell, generateJsonLd, escapeHtml, nanosToIso } from '../generate-html-shells.mjs';
+import { generateHtmlShell, generateJsonLd, escapeHtml, nanosToIso, validateSlug, validateUrl } from '../generate-html-shells.mjs';
 
 const HOSTNAME = 'https://www.helloworlddao.com';
 const FALLBACK_OG_IMAGE = `${HOSTNAME}/og-image.png`;
@@ -29,6 +29,63 @@ const samplePost = {
   published_at: 1700000000000000000, // nanoseconds
   updated_at: 1700100000000000000,
 };
+
+describe('validateSlug', () => {
+  it('accepts valid lowercase alphanumeric slug with hyphens', () => {
+    expect(validateSlug('valid-slug-123')).toBe('valid-slug-123');
+  });
+
+  it('rejects path traversal attempts', () => {
+    expect(() => validateSlug('../etc/passwd')).toThrow('path traversal');
+    expect(() => validateSlug('foo/../bar')).toThrow('path traversal');
+    expect(() => validateSlug('foo/bar')).toThrow('path traversal');
+    expect(() => validateSlug('foo\\bar')).toThrow('path traversal');
+  });
+
+  it('rejects uppercase characters', () => {
+    expect(() => validateSlug('Invalid-Slug')).toThrow('Invalid slug format');
+  });
+
+  it('rejects special characters', () => {
+    expect(() => validateSlug('slug@123')).toThrow('Invalid slug format');
+    expect(() => validateSlug('slug_123')).toThrow('Invalid slug format');
+    expect(() => validateSlug('slug.html')).toThrow('Invalid slug format');
+  });
+
+  it('rejects empty or non-string slugs', () => {
+    expect(() => validateSlug('')).toThrow('Slug is required');
+    expect(() => validateSlug(null)).toThrow('Slug is required');
+    expect(() => validateSlug(undefined)).toThrow('Slug is required');
+  });
+});
+
+describe('validateUrl', () => {
+  it('accepts valid HTTP URLs', () => {
+    expect(validateUrl('http://example.com')).toBe('http://example.com');
+  });
+
+  it('accepts valid HTTPS URLs', () => {
+    expect(validateUrl('https://example.com/path')).toBe('https://example.com/path');
+  });
+
+  it('rejects javascript: protocol', () => {
+    expect(validateUrl('javascript:alert(1)')).toBeNull();
+  });
+
+  it('rejects data: protocol', () => {
+    expect(validateUrl('data:text/html,<script>alert(1)</script>')).toBeNull();
+  });
+
+  it('returns null for invalid URLs', () => {
+    expect(validateUrl('not a url')).toBeNull();
+    expect(validateUrl('ftp://example.com')).toBeNull();
+  });
+
+  it('returns null for null/undefined', () => {
+    expect(validateUrl(null)).toBeNull();
+    expect(validateUrl(undefined)).toBeNull();
+  });
+});
 
 describe('escapeHtml', () => {
   it('escapes HTML special characters', () => {

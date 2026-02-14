@@ -20,16 +20,23 @@ on:
         description: 'Reason for manual trigger'
         required: false
         default: 'Manual blog rebuild'
+      blog_canister_id:
+        description: 'Blog canister ID (override default for testing)'
+        required: false
+        type: string
 
-# Prevent parallel deployments — only one deploy at a time.
+# Prevent parallel blog pre-rendering deployments — only one at a time.
 # New dispatches cancel older in-progress runs. (FR51, NFR21)
+# Separate from main suite deployment to avoid cancellation conflicts.
 concurrency:
-  group: marketing-suite-deploy
+  group: marketing-suite-blog-deploy
   cancel-in-progress: true
 
 # Workflow-level environment variables
 env:
-  BLOG_CANISTER_ID: dsqvo-niaaa-aaaao-a6ynq-cai
+  # Blog canister ID — uses repository variable or fallback default
+  # Override via workflow_dispatch input for testing
+  BLOG_CANISTER_ID: ${{ inputs.blog_canister_id || vars.BLOG_CANISTER_ID || 'dsqvo-niaaa-aaaao-a6ynq-cai' }}
   IC_NETWORK: ic
   DFX_NETWORK: ic
   DFX_WARNING: -mainnet_plaintext_identity
@@ -68,7 +75,20 @@ jobs:
       # blog metadata files.
       # ============================================================
       - name: Build marketing-suite
+        id: build
         run: npm run build
+
+      - name: Verify build output
+        run: |
+          if [ ! -f dist/index.html ]; then
+            echo "ERROR: Build did not produce dist/index.html"
+            exit 1
+          fi
+          if [ ! -d dist/assets ]; then
+            echo "ERROR: Build did not produce dist/assets directory"
+            exit 1
+          fi
+          echo "Build output verified: dist/index.html and dist/assets exist"
 
       # ============================================================
       # Fetch blog metadata from IC mainnet canister
@@ -116,7 +136,8 @@ jobs:
           echo "$STATUS_OUTPUT"
 
           # Extract cycle balance (format: "Balance: 1_234_567_890_123 Cycles")
-          BALANCE=$(echo "$STATUS_OUTPUT" | grep -oP 'Balance:\s+\K[0-9_]+(?=\s+Cycles)' | tr -d '_') || true
+          # Use awk for portability (grep -P is GNU-specific)
+          BALANCE=$(echo "$STATUS_OUTPUT" | awk '/Balance:/ {gsub(/_/, "", $2); print $2}') || true
           if [ -n "$BALANCE" ]; then
             echo "Current balance: $BALANCE cycles"
             if [ "$BALANCE" -lt "${{ env.CYCLE_WARNING_THRESHOLD }}" ]; then
