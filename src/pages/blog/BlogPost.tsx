@@ -28,28 +28,28 @@ function PostSkeleton() {
   return (
     <div className="animate-pulse" data-testid="post-skeleton">
       {/* Title skeleton */}
-      <div className="h-10 w-3/4 bg-slate-700 rounded mb-4" />
-      <div className="h-10 w-1/2 bg-slate-700 rounded mb-8" />
+      <div className="h-10 w-3/4 bg-slate-200 dark:bg-slate-700 rounded mb-4" />
+      <div className="h-10 w-1/2 bg-slate-200 dark:bg-slate-700 rounded mb-8" />
 
       {/* Author byline skeleton */}
-      <div className="flex items-center gap-4 py-4 mb-8 border-b border-slate-700">
-        <div className="w-12 h-12 rounded-full bg-slate-700" />
+      <div className="flex items-center gap-4 py-4 mb-8 border-b border-slate-300 dark:border-slate-700">
+        <div className="w-12 h-12 rounded-full bg-slate-200 dark:bg-slate-700" />
         <div>
-          <div className="h-4 w-32 bg-slate-700 rounded mb-2" />
-          <div className="h-3 w-48 bg-slate-700 rounded" />
+          <div className="h-4 w-32 bg-slate-200 dark:bg-slate-700 rounded mb-2" />
+          <div className="h-3 w-48 bg-slate-300 dark:bg-slate-600 rounded" />
         </div>
       </div>
 
       {/* Content skeleton */}
       <div className="space-y-4">
-        <div className="h-4 w-full bg-slate-700 rounded" />
-        <div className="h-4 w-full bg-slate-700 rounded" />
-        <div className="h-4 w-5/6 bg-slate-700 rounded" />
-        <div className="h-4 w-full bg-slate-700 rounded" />
-        <div className="h-4 w-3/4 bg-slate-700 rounded" />
-        <div className="h-32 w-full bg-slate-700 rounded mt-6" />
-        <div className="h-4 w-full bg-slate-700 rounded" />
-        <div className="h-4 w-2/3 bg-slate-700 rounded" />
+        <div className="h-4 w-full bg-slate-200 dark:bg-slate-700 rounded" />
+        <div className="h-4 w-full bg-slate-200 dark:bg-slate-700 rounded" />
+        <div className="h-4 w-5/6 bg-slate-200 dark:bg-slate-700 rounded" />
+        <div className="h-4 w-full bg-slate-200 dark:bg-slate-700 rounded" />
+        <div className="h-4 w-3/4 bg-slate-200 dark:bg-slate-700 rounded" />
+        <div className="h-32 w-full bg-slate-200 dark:bg-slate-700 rounded mt-6" />
+        <div className="h-4 w-full bg-slate-200 dark:bg-slate-700 rounded" />
+        <div className="h-4 w-2/3 bg-slate-200 dark:bg-slate-700 rounded" />
       </div>
     </div>
   );
@@ -156,11 +156,14 @@ export default function BlogPost() {
   // Collapsing header via IntersectionObserver
   useEffect(() => {
     if (!sentinelRef.current) return;
+    let cancelled = false;
 
     const observer = new IntersectionObserver(
       ([entry]) => {
         // Show sticky header when sentinel is NOT intersecting (scrolled past)
-        setHeaderVisible(!entry.isIntersecting);
+        if (!cancelled) {
+          setHeaderVisible(!entry.isIntersecting);
+        }
       },
       { threshold: 0 },
     );
@@ -168,6 +171,7 @@ export default function BlogPost() {
     observer.observe(sentinelRef.current);
 
     return () => {
+      cancelled = true;
       observer.disconnect();
     };
   }, [post]);
