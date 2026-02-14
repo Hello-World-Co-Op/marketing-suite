@@ -75,7 +75,8 @@ jobs:
       - name: Create .well-known directory
         run: |
           mkdir -p public/.well-known
-          echo "www.helloworlddao.com" > public/.well-known/ic-domains
+          echo "staging.helloworlddao.com" > public/.well-known/ic-domains
+          echo "www.helloworlddao.com" >> public/.well-known/ic-domains
 
       - name: Build for staging
         env:
