@@ -5,6 +5,12 @@ const II_IDENTITY_PROVIDER = 'https://identity.ic0.app';
 
 type LinkStatus = 'idle' | 'linking' | 'success' | 'error';
 
+/** Read a cookie value by name from document.cookie */
+function getCookie(name: string): string | null {
+  const match = document.cookie.match(new RegExp(`(?:^|; )${name}=([^;]*)`));
+  return match ? decodeURIComponent(match[1]) : null;
+}
+
 /**
  * Internet Identity linking page shown after email verification.
  * Users can link their II to get an IC principal for on-chain interactions,
@@ -56,9 +62,13 @@ export default function LinkIdentity() {
             const challenge = `ch-${timestamp}`;
             const delegationData = `${challenge}:${principal}:delegationData`;
 
+            const csrfToken = getCookie('csrf_token');
+            const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+            if (csrfToken) headers['x-csrf-token'] = csrfToken;
+
             const response = await fetch(`${oracleUrl}/api/identity/link-ii`, {
               method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
+              headers,
               credentials: 'include',
               body: JSON.stringify({ delegation: delegationData }),
             });
