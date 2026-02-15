@@ -14,6 +14,7 @@ import BlogLanding from '@/pages/blog/BlogLanding';
 // Register is imported directly (not lazy) — it's a critical conversion page
 // and lazy loading adds perceptible delay on /signup.
 import Register from '@/pages/Register';
+import VerifyEmail from '@/pages/VerifyEmail';
 
 // Non-SEO routes use lazy loading with Suspense
 const BlogPost = lazy(() => import('@/pages/blog/BlogPost'));
@@ -56,6 +57,7 @@ function App() {
             <Route path="/privacy-policy" element={<PrivacyPolicy />} />
             <Route path="/signup" element={<Register />} />
             <Route path="/register" element={<Navigate to="/signup" replace />} />
+            <Route path="/verify" element={<VerifyEmail />} />
             <Route path="/blog" element={<BlogLanding />} />
             <Route
               path="/blog/:slug"
