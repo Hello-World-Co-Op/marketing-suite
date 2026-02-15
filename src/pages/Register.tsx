@@ -872,7 +872,11 @@ Generated: ${new Date().toISOString()}
           Already have an account?{' '}
           <button
             type="button"
-            onClick={() => navigate('/login')}
+            onClick={() => {
+              // Login page is on foundery-os until universal login is built in marketing-suite
+              const founderyUrl = import.meta.env.VITE_FOUNDERY_OS_URL || 'https://staging-foundery.helloworlddao.com';
+              window.location.href = `${founderyUrl}/login`;
+            }}
             className="font-medium text-primary-700 hover:text-primary-800 hover:underline"
           >
             Sign in
