@@ -319,6 +319,13 @@ Generated: ${new Date().toISOString()}
           localStorage.setItem('verify_lastName', data.lastName);
           localStorage.setItem('verify_email', data.email);
 
+          // Store credentials in sessionStorage for auto-login after verification
+          // sessionStorage is per-tab only and clears when the tab closes
+          sessionStorage.setItem('verify_credentials', JSON.stringify({
+            email: data.email,
+            password: data.password,
+          }));
+
           // Show recovery key step instead of redirecting immediately
           setRecoveryKeyHex(masterKeyHex);
           setPendingEmail(data.email);
@@ -335,6 +342,9 @@ Generated: ${new Date().toISOString()}
           localStorage.setItem('verify_firstName', data.firstName);
           localStorage.setItem('verify_lastName', data.lastName);
           localStorage.setItem('verify_email', data.email);
+          sessionStorage.setItem('verify_credentials', JSON.stringify({
+            email: data.email, password: data.password,
+          }));
 
           setStatus({
             type: 'success',
@@ -361,6 +371,9 @@ Generated: ${new Date().toISOString()}
         localStorage.setItem('verify_firstName', data.firstName);
         localStorage.setItem('verify_lastName', data.lastName);
         localStorage.setItem('verify_email', data.email);
+        sessionStorage.setItem('verify_credentials', JSON.stringify({
+          email: data.email, password: data.password,
+        }));
 
         setStatus({
           type: 'success',
