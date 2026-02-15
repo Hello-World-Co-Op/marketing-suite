@@ -1,5 +1,5 @@
 import { Component, type ReactNode, type ErrorInfo } from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
 
 import { Suspense, lazy } from 'react';
@@ -59,6 +59,7 @@ function App() {
                 </Suspense>
               }
             />
+            <Route path="/register" element={<Navigate to="/signup" replace />} />
             <Route path="/blog" element={<BlogLanding />} />
             <Route
               path="/blog/:slug"
