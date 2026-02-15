@@ -82,7 +82,7 @@ export default function VerifyEmail() {
         navigate('/link-identity');
       } else {
         // Auto-login failed — send to foundery login with verified flag
-        const founderyUrl = import.meta.env.VITE_FOUNDERY_OS_URL || 'https://staging-foundery.helloworlddao.com';
+        const founderyUrl = import.meta.env.VITE_FOUNDERY_OS_URL || 'https://foundery.helloworlddao.com';
         window.location.href = `${founderyUrl}/login?verified=true`;
       }
     } else {

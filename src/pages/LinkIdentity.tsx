@@ -17,7 +17,7 @@ export default function LinkIdentity() {
   const [errorMessage, setErrorMessage] = useState('');
 
   const oracleUrl = import.meta.env.VITE_ORACLE_BRIDGE_URL;
-  const daoSuiteUrl = import.meta.env.VITE_DAO_SUITE_URL || 'https://staging-portal.helloworlddao.com';
+  const daoSuiteUrl = import.meta.env.VITE_DAO_SUITE_URL || 'https://portal.helloworlddao.com';
 
   // Check if user already has II linked (from session)
   useEffect(() => {
