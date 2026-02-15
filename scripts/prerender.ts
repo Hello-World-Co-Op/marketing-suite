@@ -99,13 +99,25 @@ async function prerender() {
     }
   }
 
-  // 5. Clean up SSR build artifacts
+  // 5. Generate shell HTML for SPA-only routes (no pre-rendered content).
+  // These routes don't need SEO pre-rendering but need their own index.html
+  // so the IC canister doesn't serve the pre-rendered LaunchPage HTML, which
+  // causes a React hydration mismatch and perceptible load delay.
+  const shellRoutes = ['/signup', '/register'];
+  for (const route of shellRoutes) {
+    console.log(`Shell route: ${route}`);
+    const dir = resolve(DIST, route.slice(1));
+    mkdirSync(dir, { recursive: true });
+    writeFileSync(resolve(dir, 'index.html'), template, 'utf-8');
+  }
+
+  // 6. Clean up SSR build artifacts
   if (existsSync(SSR_OUT)) {
     rmSync(SSR_OUT, { recursive: true });
   }
 
   const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
-  console.log(`Pre-rendering complete (${elapsed}s) - ${routes.length} routes`);
+  console.log(`Pre-rendering complete (${elapsed}s) - ${routes.length} routes, ${shellRoutes.length} shell routes`);
 }
 
 prerender().catch((err) => {

@@ -11,8 +11,11 @@ import LaunchPage from '@/pages/LaunchPage';
 import PrivacyPolicy from '@/pages/PrivacyPolicy';
 import BlogLanding from '@/pages/blog/BlogLanding';
 
+// Register is imported directly (not lazy) — it's a critical conversion page
+// and lazy loading adds perceptible delay on /signup.
+import Register from '@/pages/Register';
+
 // Non-SEO routes use lazy loading with Suspense
-const Register = lazy(() => import('@/pages/Register'));
 const BlogPost = lazy(() => import('@/pages/blog/BlogPost'));
 
 // ErrorBoundary component
@@ -51,14 +54,7 @@ function App() {
           <Routes>
             <Route path="/" element={<LaunchPage />} />
             <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-            <Route
-              path="/signup"
-              element={
-                <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading...</div>}>
-                  <Register />
-                </Suspense>
-              }
-            />
+            <Route path="/signup" element={<Register />} />
             <Route path="/register" element={<Navigate to="/signup" replace />} />
             <Route path="/blog" element={<BlogLanding />} />
             <Route
