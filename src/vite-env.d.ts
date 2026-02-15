@@ -11,6 +11,8 @@ interface ImportMetaEnv {
   readonly VITE_POSTHOG_HOST: string;
   readonly VITE_GA_MEASUREMENT_ID: string;
   readonly VITE_ANALYTICS_ENDPOINT: string;
+  readonly VITE_DAO_SUITE_URL: string;
+  readonly VITE_FOUNDERY_OS_URL: string;
   readonly VITE_DEV_AUTH_BYPASS: string;
   readonly VITE_E2E_AUTH_BYPASS: string;
 }

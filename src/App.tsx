@@ -18,6 +18,7 @@ import VerifyEmail from '@/pages/VerifyEmail';
 
 // Non-SEO routes use lazy loading with Suspense
 const BlogPost = lazy(() => import('@/pages/blog/BlogPost'));
+const LinkIdentity = lazy(() => import('@/pages/LinkIdentity'));
 
 // ErrorBoundary component
 class ErrorBoundary extends Component<{ children: ReactNode }, { hasError: boolean }> {
@@ -58,6 +59,14 @@ function App() {
             <Route path="/signup" element={<Register />} />
             <Route path="/register" element={<Navigate to="/signup" replace />} />
             <Route path="/verify" element={<VerifyEmail />} />
+            <Route
+              path="/link-identity"
+              element={
+                <Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-50 to-primary-100">Loading...</div>}>
+                  <LinkIdentity />
+                </Suspense>
+              }
+            />
             <Route path="/blog" element={<BlogLanding />} />
             <Route
               path="/blog/:slug"
