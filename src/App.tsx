@@ -11,14 +11,14 @@ import LaunchPage from '@/pages/LaunchPage';
 import PrivacyPolicy from '@/pages/PrivacyPolicy';
 import BlogLanding from '@/pages/blog/BlogLanding';
 
-// Register is imported directly (not lazy) — it's a critical conversion page
-// and lazy loading adds perceptible delay on /signup.
+// Register, VerifyEmail, and LinkIdentity are imported directly (not lazy) to
+// avoid hydration mismatches with pre-rendered HTML served by the IC asset canister.
 import Register from '@/pages/Register';
 import VerifyEmail from '@/pages/VerifyEmail';
+import LinkIdentity from '@/pages/LinkIdentity';
 
 // Non-SEO routes use lazy loading with Suspense
 const BlogPost = lazy(() => import('@/pages/blog/BlogPost'));
-const LinkIdentity = lazy(() => import('@/pages/LinkIdentity'));
 
 // ErrorBoundary component
 class ErrorBoundary extends Component<{ children: ReactNode }, { hasError: boolean }> {
@@ -59,14 +59,7 @@ function App() {
             <Route path="/signup" element={<Register />} />
             <Route path="/register" element={<Navigate to="/signup" replace />} />
             <Route path="/verify" element={<VerifyEmail />} />
-            <Route
-              path="/link-identity"
-              element={
-                <Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-50 to-primary-100">Loading...</div>}>
-                  <LinkIdentity />
-                </Suspense>
-              }
-            />
+            <Route path="/link-identity" element={<LinkIdentity />} />
             <Route path="/blog" element={<BlogLanding />} />
             <Route
               path="/blog/:slug"
