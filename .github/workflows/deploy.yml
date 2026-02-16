@@ -86,6 +86,7 @@ jobs:
           VITE_BLOG_CANISTER_ID: ${{ vars.VITE_BLOG_CANISTER_ID || 'dsqvo-niaaa-aaaao-a6ynq-cai' }}
           VITE_ORACLE_BRIDGE_URL: ${{ vars.VITE_ORACLE_BRIDGE_URL || 'https://staging-oracle.helloworlddao.com' }}
           VITE_FOUNDERY_OS_URL: ${{ vars.VITE_FOUNDERY_OS_URL || 'https://staging-foundery.helloworlddao.com' }}
+          VITE_DAO_SUITE_URL: ${{ vars.VITE_DAO_SUITE_URL || 'https://staging-portal.helloworlddao.com' }}
           VITE_NETWORK: "ic"
           VITE_ENVIRONMENT: "staging"
         run: npm run build
