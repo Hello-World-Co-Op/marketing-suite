@@ -81,7 +81,10 @@ export interface RegisterEmailPasswordRequest {
   job_title: [string] | [];
   interest_area: [string] | [];
   referral_source: [string] | [];
-  // BL-028.2: Optional display name (unencrypted, for cross-suite session display)
+  // BL-028.2: Optional display name (unencrypted plaintext, NOT PII).
+  // Stored as-is in user-service Profile for cross-suite session display (dashboard
+  // greetings, navigation). Unlike first_name_encrypted, this is intentionally public.
+  // Uses Candid opt encoding: [value] for Some, [] for None.
   display_name: [string] | [];
 }
 

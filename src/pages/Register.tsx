@@ -616,6 +616,7 @@ Generated: ${new Date().toISOString()}
                       {errors.firstName.message}
                     </p>
                   )}
+                  <p className="mt-1 text-xs text-slate-500">Your first name will be your public display name</p>
                 </div>
 
                 <div>
