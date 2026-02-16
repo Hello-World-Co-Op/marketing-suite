@@ -298,5 +298,27 @@ describe('validateReturnUrl', () => {
         'https://localhost:5173'
       );
     });
+
+    it('should accept http://127.0.0.1:5173/otter-camp', () => {
+      expect(validateReturnUrl('http://127.0.0.1:5173/otter-camp')).toBe(
+        'http://127.0.0.1:5173/otter-camp'
+      );
+    });
+
+    it('should accept http://127.0.0.1:5176 (root)', () => {
+      expect(validateReturnUrl('http://127.0.0.1:5176')).toBe(
+        'http://127.0.0.1:5176'
+      );
+    });
+
+    it('should accept http://[::1]:5173/test (IPv6 localhost)', () => {
+      expect(validateReturnUrl('http://[::1]:5173/test')).toBe(
+        'http://[::1]:5173/test'
+      );
+    });
+
+    it('should reject http://127.0.0.2:5173 (not localhost)', () => {
+      expect(validateReturnUrl('http://127.0.0.2:5173')).toBe('/');
+    });
   });
 });

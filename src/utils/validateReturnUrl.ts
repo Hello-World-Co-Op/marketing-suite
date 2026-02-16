@@ -78,7 +78,10 @@ function isTrustedDomain(url: string): boolean {
 function isLocalhostUrl(url: string): boolean {
   try {
     const parsed = new URL(url);
-    return parsed.protocol === 'http:' && parsed.hostname === 'localhost';
+    return parsed.protocol === 'http:' &&
+      (parsed.hostname === 'localhost' ||
+       parsed.hostname === '127.0.0.1' ||
+       parsed.hostname === '[::1]');
   } catch {
     return false;
   }
@@ -119,8 +122,8 @@ export function validateReturnUrl(url: string | null | undefined): string {
       return decoded;
     }
 
-    // Allow localhost HTTP URLs for local development
-    if (decoded.startsWith('http://localhost') && isLocalhostUrl(decoded)) {
+    // Allow localhost HTTP URLs for local development (localhost, 127.0.0.1, [::1])
+    if (decoded.startsWith('http://') && isLocalhostUrl(decoded)) {
       return decoded;
     }
 
