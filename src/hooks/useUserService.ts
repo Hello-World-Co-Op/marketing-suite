@@ -95,6 +95,8 @@ const idlFactory = (({ IDL }: { IDL: typeof import('@dfinity/candid').IDL }) => 
     job_title: IDL.Opt(IDL.Text),
     interest_area: IDL.Opt(IDL.Text),
     referral_source: IDL.Opt(IDL.Text),
+    // BL-028.2: Optional display name (unencrypted)
+    display_name: IDL.Opt(IDL.Text),
   });
 
   const AuthResponse = IDL.Record({

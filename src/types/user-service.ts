@@ -81,6 +81,8 @@ export interface RegisterEmailPasswordRequest {
   job_title: [string] | [];
   interest_area: [string] | [];
   referral_source: [string] | [];
+  // BL-028.2: Optional display name (unencrypted, for cross-suite session display)
+  display_name: [string] | [];
 }
 
 // Authentication response from user-service

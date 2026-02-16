@@ -309,6 +309,8 @@ Generated: ${new Date().toISOString()}
         job_title: data.jobTitle ? [data.jobTitle] : [],
         interest_area: data.interestArea ? [data.interestArea] : [],
         referral_source: data.referralSource ? [data.referralSource] : [],
+        // BL-028.2: Send firstName as display_name for cross-suite session display
+        display_name: [data.firstName],
       });
 
       if ('Ok' in result) {
