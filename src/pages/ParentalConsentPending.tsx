@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react';
 import { cn } from '@/utils/cn';
 import { showSuccess, showError } from '@/utils/toast';
+import { CONSENT_EXPIRY_DAYS } from '@/utils/constants';
 
 /**
  * BL-012.4: localStorage key for pending consent user ID
@@ -50,7 +51,7 @@ export default function ParentalConsentPending() {
     }
 
     const userId = localStorage.getItem(PENDING_CONSENT_USER_KEY);
-    if (!userId) {
+    if (!userId || userId.trim() === '') {
       showError('Unable to resend. Please try registering again.');
       return;
     }
@@ -103,7 +104,7 @@ export default function ParentalConsentPending() {
           {/* Explanation */}
           <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg text-blue-800 text-sm" role="status" data-testid="consent-explanation">
             <p className="mb-2">
-              We sent a consent request to your parent/guardian. They have <strong>7 days</strong> to approve your account.
+              We sent a consent request to your parent/guardian. They have <strong>{CONSENT_EXPIRY_DAYS} days</strong> to approve your account.
             </p>
             <p>
               Ask your parent or guardian to check their email for a message from Hello World DAO and click the approval link.

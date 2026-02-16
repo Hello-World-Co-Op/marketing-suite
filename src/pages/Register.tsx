@@ -102,6 +102,21 @@ export const registrationSchema = z
   )
   .refine(
     (data) => {
+      // BL-012.4: Parent email is required for 13-17 year old users (COPPA compliance)
+      const age = calculateAge(data.dobYear, data.dobMonth, data.dobDay);
+      const needsConsent = age >= 13 && age < 18;
+      if (needsConsent && (!data.parentEmail || data.parentEmail.trim() === '')) {
+        return false;
+      }
+      return true;
+    },
+    {
+      message: 'Parent/Guardian email is required for users under 18',
+      path: ['parentEmail'],
+    }
+  )
+  .refine(
+    (data) => {
       // BL-012.4: Parent email must be different from registrant email (prevents self-approval)
       if (!data.parentEmail || data.parentEmail === '') return true;
       return data.parentEmail.toLowerCase() !== data.email.toLowerCase();

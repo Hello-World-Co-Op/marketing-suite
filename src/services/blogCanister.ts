@@ -138,7 +138,7 @@ const PaginatedPostResultType = IDL.Record({
   page_size: IDL.Nat32,
 });
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+// eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars
 const idlFactory = ({ IDL: _IDL }: { IDL: any }) => {
   return IDL.Service({
     list_posts: IDL.Func(

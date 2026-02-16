@@ -210,9 +210,33 @@ describe('Register — Parental Consent (BL-012.4)', () => {
       expect(result.success).toBe(true);
     });
 
-    it('allows omitted parent email', () => {
-      const result = registrationSchema.safeParse(baseData);
+    it('allows omitted parent email (for 18+ users)', () => {
+      const result = registrationSchema.safeParse({
+        ...baseData,
+        dobYear: 1990, // adult, no parentEmail field
+      });
       expect(result.success).toBe(true);
+    });
+
+    it('rejects omitted parent email for 13-17 users', () => {
+      const result = registrationSchema.safeParse(baseData); // 15 years old, no parentEmail
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        const parentEmailError = result.error.issues.find((i) => i.path.includes('parentEmail'));
+        expect(parentEmailError?.message).toBe('Parent/Guardian email is required for users under 18');
+      }
+    });
+
+    it('rejects empty parent email for 13-17 users', () => {
+      const result = registrationSchema.safeParse({
+        ...baseData,
+        parentEmail: '',
+      });
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        const parentEmailError = result.error.issues.find((i) => i.path.includes('parentEmail'));
+        expect(parentEmailError?.message).toBe('Parent/Guardian email is required for users under 18');
+      }
     });
   });
 

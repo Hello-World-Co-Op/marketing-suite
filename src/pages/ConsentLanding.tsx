@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { cn } from '@/utils/cn';
+import { CONSENT_EXPIRY_DAYS } from '@/utils/constants';
 
 /**
  * Consent token validation response from oracle-bridge
@@ -110,8 +111,13 @@ export default function ConsentLanding() {
         setState({ type: 'approved' });
       } else {
         const data = await response.json().catch(() => ({}));
-        if (response.status === 410 || (data.error && data.error.toLowerCase().includes('expired'))) {
+        const errorMsg = (data.error || data.message || '').toLowerCase();
+
+        if (response.status === 410 || errorMsg.includes('expired')) {
           setState({ type: 'expired' });
+        } else if (errorMsg.includes('already approved') || errorMsg.includes('already been approved')) {
+          // Handle already approved case - treat it as success
+          setState({ type: 'approved' });
         } else {
           setState({
             type: 'error',
@@ -248,7 +254,7 @@ export default function ConsentLanding() {
               Consent Link Expired
             </h1>
             <p className="mt-2 text-slate-600">
-              This consent link has expired. Consent links are valid for 7 days.
+              This consent link has expired. Consent links are valid for {CONSENT_EXPIRY_DAYS} days.
             </p>
             <p className="mt-2 text-sm text-slate-500">
               The user can request a new consent email from the registration page, or contact support for assistance.
