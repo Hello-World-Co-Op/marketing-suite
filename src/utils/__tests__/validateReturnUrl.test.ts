@@ -257,4 +257,46 @@ describe('validateReturnUrl', () => {
       );
     });
   });
+
+  describe('localhost URLs for local development', () => {
+    it('should accept http://localhost:5173/otter-camp', () => {
+      expect(validateReturnUrl('http://localhost:5173/otter-camp')).toBe(
+        'http://localhost:5173/otter-camp'
+      );
+    });
+
+    it('should accept http://localhost:3000/api/test', () => {
+      expect(validateReturnUrl('http://localhost:3000/api/test')).toBe(
+        'http://localhost:3000/api/test'
+      );
+    });
+
+    it('should accept http://localhost:5173 (root)', () => {
+      expect(validateReturnUrl('http://localhost:5173')).toBe(
+        'http://localhost:5173'
+      );
+    });
+
+    it('should accept http://localhost:8080', () => {
+      expect(validateReturnUrl('http://localhost:8080')).toBe(
+        'http://localhost:8080'
+      );
+    });
+
+    it('should reject http://localhostevil.com (not actually localhost)', () => {
+      expect(validateReturnUrl('http://localhostevil.com')).toBe('/');
+      expect(consoleWarnSpy).toHaveBeenCalledWith(
+        '[Security] Rejected absolute redirect URL:',
+        'http://localhostevil.com'
+      );
+    });
+
+    it('should reject https://localhost:5173 (localhost should use http)', () => {
+      expect(validateReturnUrl('https://localhost:5173')).toBe('/');
+      expect(consoleWarnSpy).toHaveBeenCalledWith(
+        '[Security] Rejected absolute redirect URL:',
+        'https://localhost:5173'
+      );
+    });
+  });
 });

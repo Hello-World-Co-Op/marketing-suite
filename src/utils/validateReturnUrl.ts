@@ -72,6 +72,19 @@ function isTrustedDomain(url: string): boolean {
 }
 
 /**
+ * Check if an absolute URL is localhost for local development.
+ * Allows http://localhost:PORT URLs (not requiring HTTPS for local dev).
+ */
+function isLocalhostUrl(url: string): boolean {
+  try {
+    const parsed = new URL(url);
+    return parsed.protocol === 'http:' && parsed.hostname === 'localhost';
+  } catch {
+    return false;
+  }
+}
+
+/**
  * Validates and sanitizes a return URL to prevent open redirect attacks.
  *
  * Security checks:
@@ -103,6 +116,11 @@ export function validateReturnUrl(url: string | null | undefined): string {
 
     // FAS-8.1: Allow absolute HTTPS URLs to trusted domains (cross-suite SSO)
     if (decoded.startsWith('https://') && isTrustedDomain(decoded)) {
+      return decoded;
+    }
+
+    // Allow localhost HTTP URLs for local development
+    if (decoded.startsWith('http://localhost') && isLocalhostUrl(decoded)) {
       return decoded;
     }
 
