@@ -97,6 +97,10 @@ const idlFactory = (({ IDL }: { IDL: typeof import('@dfinity/candid').IDL }) => 
     referral_source: IDL.Opt(IDL.Text),
     // BL-028.2: Optional display name (unencrypted)
     display_name: IDL.Opt(IDL.Text),
+    // BL-012.4: Parent email (encrypted) for COPPA parental consent
+    parent_email_encrypted: IDL.Opt(IDL.Text),
+    // BL-012.4: Flag indicating registrant requires parental consent
+    requires_parental_consent: IDL.Opt(IDL.Bool),
   });
 
   const AuthResponse = IDL.Record({

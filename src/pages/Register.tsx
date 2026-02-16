@@ -29,6 +29,9 @@ const AGE_BLOCK_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours
 // BL-012.1: Return URL localStorage key
 const RETURN_TO_KEY = '__hw_return_to';
 
+// BL-012.4: Pending consent user ID localStorage key
+const PENDING_CONSENT_USER_KEY = '__hw_pending_consent_user';
+
 type AgeGateStatus = 'pending' | 'blocked' | 'minor' | 'adult';
 
 /**
@@ -63,6 +66,8 @@ export const registrationSchema = z
     email: interestFormSchema.shape.email,
     password: passwordSchema,
     confirmPassword: z.string(),
+    // BL-012.4: Parent/guardian email for 13-17 users (COPPA parental consent)
+    parentEmail: z.string().email('Please enter a valid email address').optional().or(z.literal('')),
     // FOS-3.3.1: Optional CRM fields for lead tracking
     company: z.string().max(100).optional(),
     jobTitle: z.string().max(100).optional(),
@@ -94,6 +99,17 @@ export const registrationSchema = z
       message: 'You must be at least 13 years old to create an account',
       path: ['dobYear'],
     }
+  )
+  .refine(
+    (data) => {
+      // BL-012.4: Parent email must be different from registrant email (prevents self-approval)
+      if (!data.parentEmail || data.parentEmail === '') return true;
+      return data.parentEmail.toLowerCase() !== data.email.toLowerCase();
+    },
+    {
+      message: 'Parent email must be different from your email',
+      path: ['parentEmail'],
+    }
   );
 
 type RegistrationFormData = z.infer<typeof registrationSchema>;
@@ -121,6 +137,8 @@ export default function Register() {
   // BL-011.2: Age gate state
   const [ageGateStatus, setAgeGateStatus] = useState<AgeGateStatus>('pending');
   const [dobValue, setDobValue] = useState<DateOfBirthValue | null>(null);
+  // BL-012.4: Parental consent state for 13-17 users
+  const [requiresParentalConsent, setRequiresParentalConsent] = useState(false);
 
   const {
     register,
@@ -189,10 +207,14 @@ export default function Register() {
       if (age < 13) {
         setAgeGateStatus('blocked');
         localStorage.setItem(AGE_BLOCK_KEY, JSON.stringify({ blocked_at: Date.now() }));
+        setRequiresParentalConsent(false);
       } else if (age < 18) {
         setAgeGateStatus('minor');
+        // BL-012.4: 13-17 users require parental consent
+        setRequiresParentalConsent(true);
       } else {
         setAgeGateStatus('adult');
+        setRequiresParentalConsent(false);
       }
     },
     [setValue, ageGateStatus]
@@ -242,12 +264,17 @@ Generated: ${new Date().toISOString()}
   }, [recoveryKeyHex]);
 
   /**
-   * Proceed to email verification after confirming recovery key saved
+   * Proceed to next step after confirming recovery key saved
    * BL-012.1: returnTo is already persisted in localStorage; no need to thread via query param
+   * BL-012.4: 13-17 users go to parental consent pending page instead of email verification
    */
   const proceedToVerification = useCallback(() => {
-    navigate(`/verify?email=${encodeURIComponent(pendingEmail)}`);
-  }, [navigate, pendingEmail]);
+    if (requiresParentalConsent) {
+      navigate('/parental-consent-pending');
+    } else {
+      navigate(`/verify?email=${encodeURIComponent(pendingEmail)}`);
+    }
+  }, [navigate, pendingEmail, requiresParentalConsent]);
 
   /**
    * Get client IP address for rate limiting
@@ -289,6 +316,12 @@ Generated: ${new Date().toISOString()}
       const dobString = `${data.dobYear}-${String(data.dobMonth).padStart(2, '0')}-${String(data.dobDay).padStart(2, '0')}`;
       const dobEncrypted = await encryptText(dobString, masterKeyHex);
 
+      // BL-012.4: Encrypt parent email if provided (13-17 users)
+      let parentEmailEncrypted: string | undefined;
+      if (requiresParentalConsent && data.parentEmail) {
+        parentEmailEncrypted = await encryptText(data.parentEmail, masterKeyHex);
+      }
+
       // 4. Generate salt and derive key from password
       setStatus({ type: 'loading', message: 'Securing your recovery key...' });
       const salt = generateSalt();
@@ -329,22 +362,43 @@ Generated: ${new Date().toISOString()}
         referral_source: data.referralSource ? [data.referralSource] : [],
         // BL-028.2: Send firstName as display_name for cross-suite session display
         display_name: [data.firstName],
+        // BL-012.4: Include parent email and consent flag for 13-17 users
+        parent_email_encrypted: parentEmailEncrypted ? [parentEmailEncrypted] : [],
+        requires_parental_consent: requiresParentalConsent ? [true] : [],
       });
 
       if ('Ok' in result) {
         const response = result.Ok;
         if (response.success) {
+          // BL-012.4: Check if parental consent is pending (13-17 users)
+          const consentPending = requiresParentalConsent ||
+            (response as { parental_consent_status?: string }).parental_consent_status === 'Pending';
+
+          if (consentPending) {
+            // BL-012.4: Store user_id for resend functionality
+            if (response.user_id) {
+              const userId = Array.isArray(response.user_id)
+                ? response.user_id[0] || ''
+                : response.user_id || '';
+              if (userId) {
+                localStorage.setItem(PENDING_CONSENT_USER_KEY, userId);
+              }
+            }
+          }
+
           // Store first/last name temporarily for verification
           localStorage.setItem('verify_firstName', data.firstName);
           localStorage.setItem('verify_lastName', data.lastName);
           localStorage.setItem('verify_email', data.email);
 
-          // Store credentials in sessionStorage for auto-login after verification
-          // sessionStorage is per-tab only and clears when the tab closes
-          sessionStorage.setItem('verify_credentials', JSON.stringify({
-            email: data.email,
-            password: data.password,
-          }));
+          if (!consentPending) {
+            // Store credentials in sessionStorage for auto-login after verification
+            // sessionStorage is per-tab only and clears when the tab closes
+            sessionStorage.setItem('verify_credentials', JSON.stringify({
+              email: data.email,
+              password: data.password,
+            }));
+          }
 
           // Show recovery key step instead of redirecting immediately
           setRecoveryKeyHex(masterKeyHex);
@@ -504,7 +558,7 @@ Generated: ${new Date().toISOString()}
                 !savedKeyConfirmed && 'opacity-50 cursor-not-allowed'
               )}
             >
-              Continue to Email Verification
+              {requiresParentalConsent ? 'Continue' : 'Continue to Email Verification'}
             </button>
           </div>
         </div>
@@ -594,10 +648,10 @@ Generated: ${new Date().toISOString()}
             collect information from children under 13.
           </div>
 
-          {/* BL-011.2: Age-appropriate messaging */}
+          {/* BL-011.2 / BL-012.4: Age-appropriate messaging */}
           {ageGateStatus === 'minor' && (
             <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg text-blue-800 text-sm" role="status">
-              You can create an account! Full membership (voting, governance) requires age 18+.
+              You can create an account! A parent or guardian must approve your account. Full membership (voting, governance) requires age 18+.
             </div>
           )}
 
@@ -686,6 +740,37 @@ Generated: ${new Date().toISOString()}
                   </p>
                 )}
               </div>
+
+              {/* BL-012.4: Parent/Guardian Email field for 13-17 users */}
+              {requiresParentalConsent && (
+                <div>
+                  <label htmlFor="parentEmail" className="block text-sm font-medium text-slate-700 mb-2">
+                    Parent/Guardian Email <span className="text-error">*</span>
+                  </label>
+                  <p className="text-xs text-slate-500 mb-2">
+                    A parent or guardian must approve your account. We'll send them a consent request.
+                  </p>
+                  <input
+                    {...register('parentEmail')}
+                    id="parentEmail"
+                    type="email"
+                    disabled={isSubmitting}
+                    placeholder="parent@example.com"
+                    autoComplete="off"
+                    data-testid="parent-email-input"
+                    className={cn(
+                      'w-full px-4 py-2 border rounded-lg',
+                      'focus-visible:outline-primary-600',
+                      errors.parentEmail ? 'border-error' : 'border-slate-300'
+                    )}
+                  />
+                  {errors.parentEmail && (
+                    <p className="mt-1 text-sm text-error" role="alert">
+                      {errors.parentEmail.message}
+                    </p>
+                  )}
+                </div>
+              )}
 
               {/* Password field */}
               <div>

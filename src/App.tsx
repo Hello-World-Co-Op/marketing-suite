@@ -16,6 +16,9 @@ import BlogLanding from '@/pages/blog/BlogLanding';
 import Register from '@/pages/Register';
 import VerifyEmail from '@/pages/VerifyEmail';
 import LinkIdentity from '@/pages/LinkIdentity';
+// BL-012.4: COPPA parental consent pages
+import ParentalConsentPending from '@/pages/ParentalConsentPending';
+import ConsentLanding from '@/pages/ConsentLanding';
 
 // Non-SEO routes use lazy loading with Suspense
 const BlogPost = lazy(() => import('@/pages/blog/BlogPost'));
@@ -60,6 +63,9 @@ function App() {
             <Route path="/register" element={<Navigate to="/signup" replace />} />
             <Route path="/verify" element={<VerifyEmail />} />
             <Route path="/link-identity" element={<LinkIdentity />} />
+            {/* BL-012.4: COPPA parental consent routes */}
+            <Route path="/parental-consent-pending" element={<ParentalConsentPending />} />
+            <Route path="/consent" element={<ConsentLanding />} />
             <Route path="/blog" element={<BlogLanding />} />
             <Route
               path="/blog/:slug"

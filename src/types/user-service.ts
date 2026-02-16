@@ -86,6 +86,11 @@ export interface RegisterEmailPasswordRequest {
   // greetings, navigation). Unlike first_name_encrypted, this is intentionally public.
   // Uses Candid opt encoding: [value] for Some, [] for None.
   display_name: [string] | [];
+  // BL-012.4: Parent email (encrypted) for 13-17 users requiring COPPA parental consent.
+  // Uses Candid opt encoding: [value] for Some, [] for None.
+  parent_email_encrypted: [string] | [];
+  // BL-012.4: Flag indicating the registrant requires parental consent.
+  requires_parental_consent: [boolean] | [];
 }
 
 // Authentication response from user-service
