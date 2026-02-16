@@ -3,12 +3,14 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import Register, { calculateAge, registrationSchema } from '../Register';
 
-// Mock useUserService
+// Mock useUserService — capture registerEmailPassword args for verification
+const mockRegisterEmailPassword = vi.fn().mockResolvedValue({
+  Ok: { success: true, message: 'Account created' },
+});
+
 vi.mock('@/hooks/useUserService', () => ({
   useUserService: () => ({
-    registerEmailPassword: vi.fn().mockResolvedValue({
-      Ok: { success: true, message: 'Account created' },
-    }),
+    registerEmailPassword: mockRegisterEmailPassword,
     submitIndividual: vi.fn(),
     verifyCode: vi.fn(),
     resendVerificationCode: vi.fn(),
@@ -228,6 +230,45 @@ describe('Register page', () => {
   it('shows privacy notice', () => {
     renderRegister();
     expect(screen.getByText(/encrypted client-side/)).toBeInTheDocument();
+  });
+
+  it('sends display_name with firstName in registration request (BL-028.2)', async () => {
+    renderRegister();
+
+    // Pass age gate
+    const birthYear = new Date().getFullYear() - 25;
+    fireEvent.change(screen.getByTestId('dob-month'), { target: { value: '6' } });
+    fireEvent.change(screen.getByTestId('dob-day'), { target: { value: '15' } });
+    fireEvent.change(screen.getByTestId('dob-year'), { target: { value: String(birthYear) } });
+
+    // Fill required fields
+    fireEvent.change(screen.getByLabelText(/First Name/), { target: { value: 'Alice' } });
+    fireEvent.change(screen.getByLabelText(/Last Name/), { target: { value: 'Smith' } });
+    fireEvent.change(screen.getByLabelText(/Email Address/), { target: { value: 'alice@example.com' } });
+    fireEvent.change(screen.getByLabelText(/^Password/), { target: { value: 'MyP@ssw0rd!23' } });
+    fireEvent.change(screen.getByLabelText(/Confirm Password/), { target: { value: 'MyP@ssw0rd!23' } });
+
+    // Submit via button role
+    fireEvent.click(screen.getByRole('button', { name: 'Create Account' }));
+
+    await waitFor(() => {
+      expect(mockRegisterEmailPassword).toHaveBeenCalledWith(
+        expect.objectContaining({
+          display_name: ['Alice'],
+        })
+      );
+    });
+  });
+
+  it('shows display name helper text on firstName field (BL-028.2)', () => {
+    renderRegister();
+
+    const birthYear = new Date().getFullYear() - 25;
+    fireEvent.change(screen.getByTestId('dob-month'), { target: { value: '6' } });
+    fireEvent.change(screen.getByTestId('dob-day'), { target: { value: '15' } });
+    fireEvent.change(screen.getByTestId('dob-year'), { target: { value: String(birthYear) } });
+
+    expect(screen.getByText('Your first name will be your public display name')).toBeInTheDocument();
   });
 
   it('renders optional fields toggle after age gate', async () => {
