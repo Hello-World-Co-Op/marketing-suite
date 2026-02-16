@@ -108,6 +108,33 @@ marketing-suite/
 - **SEO Pre-rendering**: Static HTML generation at build time for search engine indexing
 - **Blog Pre-rendering Pipeline**: GitHub Actions workflow generates per-post HTML shells with SEO metadata, RSS feed, and sitemap from blog canister data
 
+## Cross-Suite Return URL (BL-012.1)
+
+The `/signup` route accepts a `?returnTo=<url>` query parameter for cross-suite registration flows. After completing registration and email verification, the user is redirected back to the originating suite.
+
+### Query Parameter
+
+| Parameter | Description | Example |
+|-----------|-------------|---------|
+| `returnTo` | URL to return to after registration + login | `?returnTo=https://staging-ottercamp.helloworlddao.com/otter-camp` |
+
+### Security
+
+- Only HTTPS URLs to `*.helloworlddao.com` are accepted (domain allowlist)
+- HTTP, protocol-relative (`//`), `javascript:`, and `data:` URLs are rejected
+- Invalid or missing `returnTo` falls back to default behavior (no regression)
+- The validated URL is stored in `localStorage` under key `__hw_return_to`
+- After successful login on foundery-os, the key is cleared from localStorage
+
+### Flow
+
+1. External suite links to `/signup?returnTo=https://staging-ottercamp.helloworlddao.com/otter-camp`
+2. Register.tsx validates and stores `returnTo` in `localStorage.__hw_return_to`
+3. After email verification, VerifyEmail.tsx reads from localStorage and threads to foundery-os: `/login?returnUrl=<encoded-url>`
+4. Foundery-os Login validates, authenticates, redirects to returnUrl, and clears localStorage
+
+**Note**: Marketing-suite uses `returnTo` as the query param name. Foundery-os uses `returnUrl` (existing convention). The inconsistency is intentional to avoid breaking changes.
+
 ## Environment Variables
 
 Required environment variables (configure in `.env.local`):

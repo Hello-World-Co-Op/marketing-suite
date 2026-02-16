@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -16,6 +16,7 @@ import { hashIpAddress } from '@/utils/password-validation';
 import { interestFormSchema } from '@/utils/validation';
 import { useUserService } from '@/hooks/useUserService';
 import { cn } from '@/utils/cn';
+import { validateReturnUrl } from '@/utils/validateReturnUrl';
 import DateOfBirthInput, {
   getDaysInMonth,
   type DateOfBirthValue,
@@ -24,6 +25,9 @@ import DateOfBirthInput, {
 // Age gate constants
 const AGE_BLOCK_KEY = '__hw_age_block';
 const AGE_BLOCK_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours
+
+// BL-012.1: Return URL localStorage key
+const RETURN_TO_KEY = '__hw_return_to';
 
 type AgeGateStatus = 'pending' | 'blocked' | 'minor' | 'adult';
 
@@ -103,6 +107,7 @@ type RegistrationStep = 'form' | 'recovery-key';
 
 export default function Register() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { registerEmailPassword } = useUserService();
   const [status, setStatus] = useState<RegistrationStatus>({ type: 'idle' });
   const [showPassword, setShowPassword] = useState(false);
@@ -146,6 +151,18 @@ export default function Register() {
       }
     }
   }, []);
+
+  // BL-012.1: Read and validate returnTo from query params, persist in localStorage
+  useEffect(() => {
+    const returnTo = searchParams.get('returnTo');
+    if (returnTo) {
+      const validated = validateReturnUrl(returnTo);
+      // Only store if validation returned a meaningful URL (not the default '/')
+      if (validated !== '/') {
+        localStorage.setItem(RETURN_TO_KEY, validated);
+      }
+    }
+  }, [searchParams]);
 
   /**
    * BL-011.2: Handle DOB change - calculate age and set gate status
@@ -226,6 +243,7 @@ Generated: ${new Date().toISOString()}
 
   /**
    * Proceed to email verification after confirming recovery key saved
+   * BL-012.1: returnTo is already persisted in localStorage; no need to thread via query param
    */
   const proceedToVerification = useCallback(() => {
     navigate(`/verify?email=${encodeURIComponent(pendingEmail)}`);

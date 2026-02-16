@@ -3,6 +3,11 @@ import { VerificationCodeForm } from '@/components/VerificationCodeForm';
 import { useUserService } from '@/hooks/useUserService';
 
 /**
+ * BL-012.1: localStorage key for return URL threading
+ */
+const RETURN_TO_KEY = '__hw_return_to';
+
+/**
  * Auto-login via oracle-bridge after email verification.
  * Uses credentials stored in sessionStorage during registration.
  * Returns true if auto-login succeeded (session cookie set), false otherwise.
@@ -76,14 +81,26 @@ export default function VerifyEmail() {
   const handleVerify = async (code: string) => {
     const result = await verifyCode(email, code);
     if (result.success) {
+      // BL-012.1: Read returnTo from localStorage for post-login redirect
+      const returnTo = localStorage.getItem(RETURN_TO_KEY);
       const loggedIn = await autoLogin();
       if (loggedIn) {
         // Session cookie set — go to II linking page
-        navigate('/link-identity');
+        // BL-012.1: Thread returnTo to link-identity if present
+        if (returnTo) {
+          navigate(`/link-identity?returnTo=${encodeURIComponent(returnTo)}`);
+        } else {
+          navigate('/link-identity');
+        }
       } else {
         // Auto-login failed — send to foundery login with verified flag
         const founderyUrl = import.meta.env.VITE_FOUNDERY_OS_URL || 'https://foundery.helloworlddao.com';
-        window.location.href = `${founderyUrl}/login?verified=true`;
+        // BL-012.1: Thread returnTo to foundery-os login via returnUrl query param
+        if (returnTo) {
+          window.location.href = `${founderyUrl}/login?returnUrl=${encodeURIComponent(returnTo)}`;
+        } else {
+          window.location.href = `${founderyUrl}/login?verified=true`;
+        }
       }
     } else {
       throw new Error(result.message || 'Verification failed');
