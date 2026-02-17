@@ -16,7 +16,7 @@ import { hashIpAddress } from '@/utils/password-validation';
 import { interestFormSchema } from '@/utils/validation';
 import { useUserService } from '@/hooks/useUserService';
 import { cn } from '@/utils/cn';
-import { validateReturnUrl } from '@/utils/validateReturnUrl';
+import { validateReturnUrl } from '@hello-world-co-op/auth';
 import DateOfBirthInput, {
   getDaysInMonth,
   type DateOfBirthValue,
@@ -31,6 +31,29 @@ const RETURN_TO_KEY = '__hw_return_to';
 
 // BL-012.4: Pending consent user ID localStorage key
 const PENDING_CONSENT_USER_KEY = '__hw_pending_consent_user';
+
+/**
+ * Allowed path prefixes for marketing-suite relative redirects.
+ * @see BL-031.2 — migrated from local validateReturnUrl.ts
+ */
+const MARKETING_ALLOWED_PATHS = [
+  '/signup',
+  '/verify',
+  '/login',
+  '/link-identity',
+  '/mission-control',
+  '/dashboard',
+  '/settings',
+  '/profile',
+  '/chat',
+  '/fleet',
+  '/workspace',
+  '/backlog',
+  '/capture',
+  '/admin',
+  '/otter-camp',
+  '/blog',
+];
 
 type AgeGateStatus = 'pending' | 'blocked' | 'minor' | 'adult';
 
@@ -189,7 +212,7 @@ export default function Register() {
   useEffect(() => {
     const returnTo = searchParams.get('returnTo');
     if (returnTo) {
-      const validated = validateReturnUrl(returnTo);
+      const validated = validateReturnUrl(returnTo, { allowedPaths: MARKETING_ALLOWED_PATHS, defaultRedirect: '/' });
       // Only store if validation returned a meaningful URL (not the default '/')
       if (validated !== '/') {
         localStorage.setItem(RETURN_TO_KEY, validated);
