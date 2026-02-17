@@ -59,7 +59,7 @@ export default function ConsentLanding() {
 
     const validateToken = async () => {
       try {
-        const response = await fetch(`${getOracleBridgeUrl()}/api/auth/consent/${encodeURIComponent(token)}`, {
+        const response = await fetch(`${getOracleBridgeUrl()}/api/auth/consent/${token}`, {
           method: 'GET',
           headers: { 'Content-Type': 'application/json' },
         });
@@ -76,6 +76,7 @@ export default function ConsentLanding() {
           });
         } else {
           const data = await response.json().catch(() => ({}));
+          // 410 Gone = consent token has expired
           if (response.status === 410 || (data.error && data.error.toLowerCase().includes('expired'))) {
             setState({ type: 'expired' });
           } else {
@@ -100,7 +101,7 @@ export default function ConsentLanding() {
     setState({ type: 'processing' });
     try {
       const response = await fetch(
-        `${getOracleBridgeUrl()}/api/auth/consent/${encodeURIComponent(token)}/approve`,
+        `${getOracleBridgeUrl()}/api/auth/consent/${token}/approve`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -113,6 +114,7 @@ export default function ConsentLanding() {
         const data = await response.json().catch(() => ({}));
         const errorMsg = (data.error || data.message || '').toLowerCase();
 
+        // 410 Gone = consent token has expired
         if (response.status === 410 || errorMsg.includes('expired')) {
           setState({ type: 'expired' });
         } else if (errorMsg.includes('already approved') || errorMsg.includes('already been approved')) {
@@ -137,7 +139,7 @@ export default function ConsentLanding() {
     setState({ type: 'processing' });
     try {
       const response = await fetch(
-        `${getOracleBridgeUrl()}/api/auth/consent/${encodeURIComponent(token)}/deny`,
+        `${getOracleBridgeUrl()}/api/auth/consent/${token}/deny`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -192,6 +194,7 @@ export default function ConsentLanding() {
           <div className="text-center mb-6">
             <div className="mx-auto mb-4 h-12 w-12 rounded-full bg-green-100 flex items-center justify-center">
               <span className="text-green-600 text-2xl" aria-hidden="true">&#x2713;</span>
+              <span className="sr-only">Success</span>
             </div>
             <h1 className="text-2xl font-bold text-slate-900" data-testid="consent-approved-heading">
               Account Activated

@@ -238,6 +238,19 @@ describe('Register — Parental Consent (BL-012.4)', () => {
         expect(parentEmailError?.message).toBe('Parent/Guardian email is required for users under 18');
       }
     });
+
+    it('rejects whitespace-only parent email for 13-17 users', () => {
+      const result = registrationSchema.safeParse({
+        ...baseData,
+        parentEmail: '   ',
+      });
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        const parentEmailError = result.error.issues.find((i) => i.path.includes('parentEmail'));
+        // Whitespace-only fails email validation before the required check
+        expect(parentEmailError?.message).toBe('Please enter a valid email address');
+      }
+    });
   });
 
   describe('Registration submission for 13-17 users', () => {
