@@ -14,10 +14,11 @@ export type ConsentStatus = 'granted' | 'denied' | 'pending';
 const CONSENT_KEY = 'analytics_consent';
 
 function isDNTEnabled(): boolean {
-  if (typeof navigator === 'undefined') return false;
+  if (typeof navigator === 'undefined' || typeof window === 'undefined') return false;
   const dnt =
     navigator.doNotTrack ||
-    (window as unknown as { doNotTrack?: string }).doNotTrack;
+    (window as unknown as { doNotTrack?: string }).doNotTrack ||
+    (navigator as unknown as { msDoNotTrack?: string }).msDoNotTrack;
   return dnt === '1' || dnt === 'yes';
 }
 

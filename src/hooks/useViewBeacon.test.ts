@@ -107,12 +107,22 @@ describe('useViewBeacon', () => {
   });
 
   // Test 5: sendBeacon called when visibility changes to hidden (AC2, AC5)
-  it('calls sendBeacon with read_time_seconds when visibility changes to hidden', () => {
+  // Validates that the Blob payload contains slug and read_time_seconds (not referrer)
+  it('calls sendBeacon with slug and read_time_seconds payload when visibility changes to hidden', () => {
     mockGetConsentStatus.mockReturnValue('granted');
+
+    // Capture Blob constructor args to inspect payload (jsdom Blob lacks .text())
+    const blobContents: string[] = [];
+    const OriginalBlob = global.Blob;
+    vi.stubGlobal('Blob', class MockBlob extends OriginalBlob {
+      constructor(parts: BlobPart[], options?: BlobPropertyBag) {
+        super(parts, options);
+        if (typeof parts[0] === 'string') blobContents.push(parts[0]);
+      }
+    });
 
     renderHook(() => useViewBeacon('test-post'));
 
-    // Simulate some time passing (the hook uses Date.now())
     act(() => {
       Object.defineProperty(document, 'visibilityState', {
         configurable: true,
@@ -124,8 +134,121 @@ describe('useViewBeacon', () => {
     expect(mockSendBeacon).toHaveBeenCalledTimes(1);
     expect(mockSendBeacon).toHaveBeenCalledWith(
       'http://test-oracle:8787/api/blog/views',
-      expect.any(Blob),
+      expect.any(OriginalBlob),
     );
+
+    // Validate the Blob payload contains slug and read_time_seconds
+    expect(blobContents.length).toBeGreaterThan(0);
+    const payload = JSON.parse(blobContents[0]) as Record<string, unknown>;
+    expect(payload).toHaveProperty('slug', 'test-post');
+    expect(payload).toHaveProperty('read_time_seconds');
+    expect(typeof payload.read_time_seconds).toBe('number');
+    // Should NOT include referrer in read-time beacon
+    expect(payload).not.toHaveProperty('referrer');
+  });
+
+  // Test 9: read time pauses when hidden and resumes on visible (AC5)
+  it('pauses read time accumulation while tab is hidden and resumes on visible', () => {
+    mockGetConsentStatus.mockReturnValue('granted');
+
+    // Capture Blob constructor args to inspect payload (jsdom Blob lacks .text())
+    const blobContents: string[] = [];
+    const OriginalBlob = global.Blob;
+    vi.stubGlobal('Blob', class MockBlob extends OriginalBlob {
+      constructor(parts: BlobPart[], options?: BlobPropertyBag) {
+        super(parts, options);
+        if (typeof parts[0] === 'string') blobContents.push(parts[0]);
+      }
+    });
+
+    const dateNowSpy = vi.spyOn(Date, 'now');
+    let fakeNow = 1000000;
+    dateNowSpy.mockImplementation(() => fakeNow);
+
+    renderHook(() => useViewBeacon('test-post'));
+
+    // Advance time 10 seconds (still visible)
+    fakeNow += 10000;
+
+    // Hide tab — beacon sent with 10s of accumulated active time
+    act(() => {
+      Object.defineProperty(document, 'visibilityState', {
+        configurable: true,
+        get: () => 'hidden',
+      });
+      document.dispatchEvent(new Event('visibilitychange'));
+    });
+
+    expect(mockSendBeacon).toHaveBeenCalledTimes(1);
+    const payload1 = JSON.parse(blobContents[0]) as Record<string, unknown>;
+    expect(payload1.read_time_seconds).toBe(10); // 10s of active time
+
+    // Advance time 60 seconds (tab hidden — should NOT accumulate)
+    fakeNow += 60000;
+
+    // Show tab again — timer resets
+    act(() => {
+      Object.defineProperty(document, 'visibilityState', {
+        configurable: true,
+        get: () => 'visible',
+      });
+      document.dispatchEvent(new Event('visibilitychange'));
+    });
+
+    // Advance time 5 more seconds (visible — should accumulate)
+    fakeNow += 5000;
+
+    // Hide tab again — beacon sent with cumulative active time (10 + 5 = 15s)
+    act(() => {
+      Object.defineProperty(document, 'visibilityState', {
+        configurable: true,
+        get: () => 'hidden',
+      });
+      document.dispatchEvent(new Event('visibilitychange'));
+    });
+
+    expect(mockSendBeacon).toHaveBeenCalledTimes(2);
+    const payload2 = JSON.parse(blobContents[1]) as Record<string, unknown>;
+    // Accumulated: 10s (first session) + 5s (second session) = 15s
+    // Hidden time (60s) must NOT be included
+    expect(payload2.read_time_seconds).toBe(15);
+
+    dateNowSpy.mockRestore();
+  });
+
+  // Test 10: sendBeacon fires on SPA unmount (read time for in-tab navigation) (AC2)
+  it('fires read time beacon on hook unmount for SPA navigation', () => {
+    mockGetConsentStatus.mockReturnValue('granted');
+
+    // Capture Blob constructor args to inspect payload (jsdom Blob lacks .text())
+    const blobContents: string[] = [];
+    const OriginalBlob = global.Blob;
+    vi.stubGlobal('Blob', class MockBlob extends OriginalBlob {
+      constructor(parts: BlobPart[], options?: BlobPropertyBag) {
+        super(parts, options);
+        if (typeof parts[0] === 'string') blobContents.push(parts[0]);
+      }
+    });
+
+    const dateNowSpy = vi.spyOn(Date, 'now');
+    let fakeNow = 2000000;
+    dateNowSpy.mockImplementation(() => fakeNow);
+
+    const { unmount } = renderHook(() => useViewBeacon('test-post'));
+
+    // Advance time 20 seconds (tab remains visible — user reads, then clicks to another post)
+    fakeNow += 20000;
+
+    // Unmount (SPA navigation to another post)
+    unmount();
+
+    expect(mockSendBeacon).toHaveBeenCalledTimes(1);
+    expect(blobContents.length).toBeGreaterThan(0);
+    const payload = JSON.parse(blobContents[0]) as Record<string, unknown>;
+    expect(payload).toHaveProperty('slug', 'test-post');
+    expect(payload.read_time_seconds).toBe(20);
+
+    dateNowSpy.mockRestore();
   });
 
   // Test 6: fetch failure is swallowed silently (AC4)
