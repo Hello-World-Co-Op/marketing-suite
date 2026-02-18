@@ -35,6 +35,7 @@ export interface DateOfBirthInputProps {
 /**
  * Get the number of days in a given month/year, accounting for leap years
  */
+// eslint-disable-next-line react-refresh/only-export-components
 export function getDaysInMonth(month: number, year: number): number {
   if (month < 1 || month > 12) return 31;
   // Use Date constructor: day 0 of next month = last day of this month
@@ -44,6 +45,7 @@ export function getDaysInMonth(month: number, year: number): number {
 /**
  * Check if a given year is a leap year
  */
+// eslint-disable-next-line react-refresh/only-export-components
 export function isLeapYear(year: number): boolean {
   return (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0;
 }

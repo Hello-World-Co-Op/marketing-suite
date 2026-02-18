@@ -13,6 +13,7 @@ import { useEffect, useRef, useState, useCallback } from 'react';
 import '@/styles/blog-typography.css';
 
 /** Extract clean text from a code block element, stripping artifacts */
+// eslint-disable-next-line react-refresh/only-export-components
 export function extractCleanCode(codeElement: HTMLElement): string {
   // Clone the element to avoid modifying the DOM
   const clone = codeElement.cloneNode(true) as HTMLElement;

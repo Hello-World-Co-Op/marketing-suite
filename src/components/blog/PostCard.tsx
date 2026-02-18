@@ -23,6 +23,7 @@ export interface PostCardProps {
 }
 
 /** Calculate reading time in minutes based on word count */
+// eslint-disable-next-line react-refresh/only-export-components
 export function calculateReadingTime(body: string): number {
   const wordCount = body.trim().split(/\s+/).filter(Boolean).length;
   return Math.max(1, Math.ceil(wordCount / 200));

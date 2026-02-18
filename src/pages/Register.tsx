@@ -60,6 +60,7 @@ type AgeGateStatus = 'pending' | 'blocked' | 'minor' | 'adult';
 /**
  * Calculate age from DOB components
  */
+// eslint-disable-next-line react-refresh/only-export-components
 export function calculateAge(year: number, month: number, day: number): number {
   const today = new Date();
   const birthDate = new Date(year, month - 1, day);
@@ -78,6 +79,7 @@ export function calculateAge(year: number, month: number, day: number): number {
  * BL-011.2: Extended with DOB fields for COPPA compliance
  * @exports registrationSchema - Exported for testing
  */
+// eslint-disable-next-line react-refresh/only-export-components
 export const registrationSchema = z
   .object({
     // BL-011.2: DOB fields for age verification

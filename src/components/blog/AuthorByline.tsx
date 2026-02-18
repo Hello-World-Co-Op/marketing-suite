@@ -21,6 +21,7 @@ export interface AuthorBylineProps {
 }
 
 /** Calculate reading time in minutes based on word count of HTML body */
+// eslint-disable-next-line react-refresh/only-export-components
 export function calculateReadingTime(htmlBody: string): number {
   // Strip HTML tags, then count words
   const textContent = htmlBody.replace(/<[^>]*>/g, ' ');
@@ -29,6 +30,7 @@ export function calculateReadingTime(htmlBody: string): number {
 }
 
 /** Format a JS millisecond timestamp to a locale-aware date string */
+// eslint-disable-next-line react-refresh/only-export-components
 export function formatPublishedDate(timestampMs: number): string {
   return new Intl.DateTimeFormat('en-US', {
     year: 'numeric',
