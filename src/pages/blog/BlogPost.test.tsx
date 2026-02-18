@@ -6,6 +6,14 @@ import BlogPost from './BlogPost';
 import type { BlogPost as BlogPostType } from '@/services/blogCanister';
 
 // ============================================================
+// Mock useViewBeacon to prevent real beacons in tests
+// ============================================================
+
+vi.mock('@/hooks/useViewBeacon', () => ({
+  useViewBeacon: vi.fn(),
+}));
+
+// ============================================================
 // Mock highlight.js (dynamically imported by PostContent)
 // ============================================================
 

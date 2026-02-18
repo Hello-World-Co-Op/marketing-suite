@@ -20,6 +20,7 @@ import PostContent from '@/components/blog/PostContent';
 import AuthorByline from '@/components/blog/AuthorByline';
 import PostCTABlock from '@/components/blog/PostCTABlock';
 import { useBlogPost } from '@/hooks/useBlogPost';
+import { useViewBeacon } from '@/hooks/useViewBeacon';
 
 // ============================================================
 // Loading Skeleton (prevent CLS per NFR8)
@@ -150,6 +151,9 @@ export default function BlogPost() {
   const { data: post, loading, error } = useBlogPost(slug);
   const sentinelRef = useRef<HTMLDivElement>(null);
   const [headerVisible, setHeaderVisible] = useState(false);
+
+  // BL-020.2: Fire view beacon for analytics
+  useViewBeacon(slug);
 
   // Skip-to-content target
   const mainRef = useRef<HTMLElement>(null);
