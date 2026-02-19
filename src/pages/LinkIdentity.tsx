@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { AuthClient } from '@dfinity/auth-client';
+import { validateReturnUrl } from '@hello-world-co-op/auth';
 
 const II_IDENTITY_PROVIDER = 'https://identity.ic0.app';
 
@@ -12,18 +14,30 @@ function getCookie(name: string): string | null {
 }
 
 /**
- * Internet Identity linking page shown after email verification.
- * Users can link their II to get an IC principal for on-chain interactions,
- * or skip and link later from Settings.
+ * Internet Identity linking page — mandatory step for all email/password users.
+ * Users must link their II to get an IC principal for on-chain interactions
+ * before accessing any protected DAO suite page.
  *
- * Story: BL-027.1
+ * Story: BL-027.1, BL-005.4 (mandatory enforcement)
  */
 export default function LinkIdentity() {
   const [status, setStatus] = useState<LinkStatus>('idle');
   const [errorMessage, setErrorMessage] = useState('');
+  const [searchParams] = useSearchParams();
 
   const oracleUrl = import.meta.env.VITE_ORACLE_BRIDGE_URL;
   const daoSuiteUrl = import.meta.env.VITE_DAO_SUITE_URL || 'https://portal.helloworlddao.com';
+  const returnUrl = searchParams.get('returnUrl');
+
+  /**
+   * Compute safe redirect destination using returnUrl from query params.
+   * Falls back to daoSuiteUrl if no returnUrl or if it fails validation.
+   */
+  const getSuccessRedirect = () => {
+    if (!returnUrl) return `${daoSuiteUrl}/dashboard?ii_linked=true`;
+    const validated = validateReturnUrl(returnUrl, { defaultRedirect: `${daoSuiteUrl}/dashboard?ii_linked=true` });
+    return validated;
+  };
 
   // Check if user already has II linked (from session)
   useEffect(() => {
@@ -35,14 +49,15 @@ export default function LinkIdentity() {
         });
         const data = await res.json();
         if (data.authenticated && data.ic_principal) {
-          // Already linked — skip straight to dashboard
-          window.location.href = daoSuiteUrl;
+          // Already linked — redirect to returnUrl or dashboard
+          window.location.href = getSuccessRedirect();
         }
       } catch {
         // Session check failed — show the page anyway
       }
     };
     checkExistingLink();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [oracleUrl, daoSuiteUrl]);
 
   const handleLinkII = async () => {
@@ -79,21 +94,21 @@ export default function LinkIdentity() {
               setStatus('success');
               // Brief delay so user sees success state
               setTimeout(() => {
-                window.location.href = `${daoSuiteUrl}/dashboard?ii_linked=true`;
+                window.location.href = getSuccessRedirect();
               }, 1500);
             } else if (result.message?.includes('already linked')) {
               // Edge case: already linked by another path
               setStatus('success');
               setTimeout(() => {
-                window.location.href = `${daoSuiteUrl}/dashboard`;
+                window.location.href = getSuccessRedirect();
               }, 1000);
             } else {
               setStatus('error');
-              setErrorMessage(result.message || 'Failed to link Internet Identity. You can try again or skip for now.');
+              setErrorMessage(result.message || 'Failed to link Internet Identity. Please try again.');
             }
           } catch (err) {
             setStatus('error');
-            setErrorMessage('Network error while linking. You can try again or skip for now.');
+            setErrorMessage('Network error while linking. Please try again.');
             console.error('[LinkIdentity] API call failed:', err);
           }
         },
@@ -102,7 +117,7 @@ export default function LinkIdentity() {
           setErrorMessage(
             typeof err === 'string' && err.includes('popup')
               ? 'The Internet Identity popup was blocked. Please allow popups for this site and try again.'
-              : 'Internet Identity authentication was cancelled or failed. You can try again or skip for now.'
+              : 'Internet Identity authentication was cancelled or failed. Please try again.'
           );
         },
       });
@@ -111,10 +126,6 @@ export default function LinkIdentity() {
       setErrorMessage('Could not initialize authentication. Please try again.');
       console.error('[LinkIdentity] AuthClient error:', err);
     }
-  };
-
-  const handleSkip = () => {
-    window.location.href = daoSuiteUrl;
   };
 
   return (
@@ -178,7 +189,7 @@ export default function LinkIdentity() {
             onClick={handleLinkII}
             disabled={status === 'linking' || status === 'success'}
             className="w-full py-3 px-4 bg-primary-700 text-white rounded-lg font-semibold hover:bg-primary-800 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            aria-label="Link Internet Identity"
+            aria-label="Link Internet Identity to Continue"
           >
             {status === 'linking' ? (
               <span className="flex items-center justify-center gap-2">
@@ -189,24 +200,22 @@ export default function LinkIdentity() {
                 Connecting...
               </span>
             ) : (
-              'Link Internet Identity'
+              'Link Internet Identity to Continue'
             )}
-          </button>
-
-          <button
-            onClick={handleSkip}
-            disabled={status === 'linking' || status === 'success'}
-            className="w-full py-3 px-4 text-slate-600 hover:text-slate-900 font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            aria-label="Skip linking and go to dashboard"
-          >
-            Skip for now
           </button>
         </div>
 
-        {/* Info note */}
-        <p className="mt-6 text-center text-xs text-slate-400">
-          You can always link your Internet Identity later from Settings.
-        </p>
+        {/* Help links */}
+        <div className="mt-6 text-center space-y-2">
+          <a
+            href="https://internetcomputer.org/docs/building-apps/authentication/internet-identity"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-sm text-slate-500 hover:text-slate-700 underline"
+          >
+            Having trouble?
+          </a>
+        </div>
       </div>
     </div>
   );

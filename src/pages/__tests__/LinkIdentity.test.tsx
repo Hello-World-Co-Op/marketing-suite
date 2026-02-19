@@ -3,15 +3,24 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 
 // Use vi.hoisted to create mock fns that can be referenced in vi.mock factory
-const { mockLogin, mockGetIdentity, mockCreate } = vi.hoisted(() => {
+const { mockLogin, mockGetIdentity, mockCreate, mockValidateReturnUrl } = vi.hoisted(() => {
   const mockLogin = vi.fn();
   const mockGetIdentity = vi.fn();
   const mockCreate = vi.fn();
-  return { mockLogin, mockGetIdentity, mockCreate };
+  const mockValidateReturnUrl = vi.fn((url: string, opts: { defaultRedirect: string }) => {
+    // Simple mock: return the URL if it's a trusted domain, otherwise default
+    if (url.includes('helloworlddao.com') || url.includes('localhost')) return url;
+    return opts.defaultRedirect;
+  });
+  return { mockLogin, mockGetIdentity, mockCreate, mockValidateReturnUrl };
 });
 
 vi.mock('@dfinity/auth-client', () => ({
   AuthClient: { create: mockCreate },
+}));
+
+vi.mock('@hello-world-co-op/auth', () => ({
+  validateReturnUrl: mockValidateReturnUrl,
 }));
 
 import LinkIdentity from '../LinkIdentity';
@@ -19,9 +28,9 @@ import LinkIdentity from '../LinkIdentity';
 // Track window.location.href assignments via a persistent mock object
 const mockLocation = { href: '', assign: vi.fn(), replace: vi.fn(), reload: vi.fn() } as unknown as Location;
 
-function renderLinkIdentity() {
+function renderLinkIdentity(route = '/link-identity') {
   return render(
-    <MemoryRouter initialEntries={['/link-identity']}>
+    <MemoryRouter initialEntries={[route]}>
       <LinkIdentity />
     </MemoryRouter>
   );
@@ -64,11 +73,12 @@ describe('LinkIdentity', () => {
     expect(screen.getByText('Self-Custody')).toBeInTheDocument();
   });
 
-  it('renders the link button and skip button', () => {
+  it('renders the link button (no skip button)', () => {
     renderLinkIdentity();
 
-    expect(screen.getByRole('button', { name: /link internet identity/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /skip/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /link internet identity to continue/i })).toBeInTheDocument();
+    // Skip button should NOT exist after BL-005.4
+    expect(screen.queryByRole('button', { name: /skip/i })).not.toBeInTheDocument();
   });
 
   it('has accessible benefits list', () => {
@@ -81,21 +91,12 @@ describe('LinkIdentity', () => {
     expect(items).toHaveLength(4);
   });
 
-  it('skip button sets window.location.href to dao-suite URL', () => {
-    renderLinkIdentity();
-
-    const skipButton = screen.getByRole('button', { name: /skip/i });
-    fireEvent.click(skipButton);
-
-    expect(mockLocation.href).toBe('https://portal.test.com');
-  });
-
   it('link button triggers II auth flow', async () => {
     mockLogin.mockImplementation(() => Promise.resolve());
 
     renderLinkIdentity();
 
-    const linkButton = screen.getByRole('button', { name: /link internet identity/i });
+    const linkButton = screen.getByRole('button', { name: /link internet identity to continue/i });
     fireEvent.click(linkButton);
 
     await waitFor(() => {
@@ -112,7 +113,7 @@ describe('LinkIdentity', () => {
 
     renderLinkIdentity();
 
-    const linkButton = screen.getByRole('button', { name: /link internet identity/i });
+    const linkButton = screen.getByRole('button', { name: /link internet identity to continue/i });
     fireEvent.click(linkButton);
 
     await waitFor(() => {
@@ -139,7 +140,7 @@ describe('LinkIdentity', () => {
 
     renderLinkIdentity();
 
-    const linkButton = screen.getByRole('button', { name: /link internet identity/i });
+    const linkButton = screen.getByRole('button', { name: /link internet identity to continue/i });
     fireEvent.click(linkButton);
 
     await waitFor(() => {
@@ -166,7 +167,7 @@ describe('LinkIdentity', () => {
 
     renderLinkIdentity();
 
-    const linkButton = screen.getByRole('button', { name: /link internet identity/i });
+    const linkButton = screen.getByRole('button', { name: /link internet identity to continue/i });
     fireEvent.click(linkButton);
 
     await waitFor(() => {
@@ -182,7 +183,7 @@ describe('LinkIdentity', () => {
 
     renderLinkIdentity();
 
-    const linkButton = screen.getByRole('button', { name: /link internet identity/i });
+    const linkButton = screen.getByRole('button', { name: /link internet identity to continue/i });
     fireEvent.click(linkButton);
 
     await waitFor(() => {
@@ -190,24 +191,28 @@ describe('LinkIdentity', () => {
     });
   });
 
-  it('shows info note about linking later', () => {
+  it('renders "Having trouble?" help link instead of skip note', () => {
     renderLinkIdentity();
 
-    expect(
-      screen.getByText(/you can always link your internet identity later from settings/i)
-    ).toBeInTheDocument();
+    const helpLink = screen.getByRole('link', { name: /having trouble/i });
+    expect(helpLink).toBeInTheDocument();
+    expect(helpLink).toHaveAttribute('href', 'https://internetcomputer.org/docs/building-apps/authentication/internet-identity');
+    expect(helpLink).toHaveAttribute('target', '_blank');
+
+    // Old "link later from settings" note should NOT exist
+    expect(screen.queryByText(/you can always link your internet identity later/i)).not.toBeInTheDocument();
   });
 
-  it('disables buttons during linking', async () => {
+  it('disables link button during linking', async () => {
     mockLogin.mockImplementation(() => new Promise(() => {})); // Never resolves
 
     renderLinkIdentity();
 
-    const linkButton = screen.getByRole('button', { name: /link internet identity/i });
+    const linkButton = screen.getByRole('button', { name: /link internet identity to continue/i });
     fireEvent.click(linkButton);
 
     await waitFor(() => {
-      expect(screen.getByRole('button', { name: /skip/i })).toBeDisabled();
+      expect(linkButton).toBeDisabled();
     });
   });
 
@@ -219,7 +224,71 @@ describe('LinkIdentity', () => {
     renderLinkIdentity();
 
     await waitFor(() => {
-      expect(mockLocation.href).toBe('https://portal.test.com');
+      expect(mockLocation.href).toBe('https://portal.test.com/dashboard?ii_linked=true');
     });
+  });
+
+  it('uses returnUrl from query params for redirect after successful linking', async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+
+    mockGetIdentity.mockReturnValue({
+      getPrincipal: () => ({ toText: () => 'abc-123-def' }),
+    });
+
+    mockLogin.mockImplementation(async ({ onSuccess }: { onSuccess: () => Promise<void> }) => {
+      await onSuccess();
+    });
+
+    vi.spyOn(globalThis, 'fetch')
+      .mockResolvedValueOnce({
+        json: () => Promise.resolve({ authenticated: false }),
+      } as Response)
+      .mockResolvedValueOnce({
+        json: () => Promise.resolve({ success: true }),
+      } as Response);
+
+    // Render with returnUrl in query params
+    renderLinkIdentity('/link-identity?returnUrl=https%3A%2F%2Fstaging-governance.helloworlddao.com%2Fvoting');
+
+    const linkButton = screen.getByRole('button', { name: /link internet identity to continue/i });
+    fireEvent.click(linkButton);
+
+    // Verify success message appears
+    await waitFor(() => {
+      expect(screen.getByText('Internet Identity linked successfully!')).toBeInTheDocument();
+    });
+
+    // Advance past the setTimeout (1500ms) to trigger the redirect
+    await vi.advanceTimersByTimeAsync(2000);
+
+    // Verify validateReturnUrl was called with the returnUrl from query params
+    expect(mockValidateReturnUrl).toHaveBeenCalledWith(
+      'https://staging-governance.helloworlddao.com/voting',
+      expect.objectContaining({ defaultRedirect: expect.stringContaining('dashboard') })
+    );
+
+    vi.useRealTimers();
+  });
+
+  it('uses returnUrl for redirect when user already has II linked', async () => {
+    const fetchSpy = vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce({
+      json: () => Promise.resolve({ authenticated: true, ic_principal: 'abc-123-def' }),
+    } as Response);
+
+    renderLinkIdentity('/link-identity?returnUrl=https%3A%2F%2Fstaging-portal.helloworlddao.com%2Fproposals');
+
+    // Wait for the fetch to be called (session check in useEffect)
+    await waitFor(() => {
+      expect(fetchSpy).toHaveBeenCalledWith(
+        expect.stringContaining('/api/auth/session'),
+        expect.objectContaining({ credentials: 'include' })
+      );
+    });
+
+    // Verify validateReturnUrl was called with the returnUrl
+    expect(mockValidateReturnUrl).toHaveBeenCalledWith(
+      'https://staging-portal.helloworlddao.com/proposals',
+      expect.objectContaining({ defaultRedirect: expect.stringContaining('dashboard') })
+    );
   });
 });
