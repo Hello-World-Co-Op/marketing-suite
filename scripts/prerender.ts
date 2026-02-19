@@ -103,7 +103,7 @@ async function prerender() {
   // These routes don't need SEO pre-rendering but need their own index.html
   // so the IC canister doesn't serve the pre-rendered LaunchPage HTML, which
   // causes a React hydration mismatch and perceptible load delay.
-  const shellRoutes = ['/signup', '/register', '/verify'];
+  const shellRoutes = ['/signup', '/register', '/verify', '/link-identity', '/complete-profile', '/parental-consent-pending', '/consent'];
   for (const route of shellRoutes) {
     console.log(`Shell route: ${route}`);
     const dir = resolve(DIST, route.slice(1));
