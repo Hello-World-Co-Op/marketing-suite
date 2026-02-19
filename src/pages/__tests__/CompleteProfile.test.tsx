@@ -114,6 +114,17 @@ describe('CompleteProfile', () => {
   it('shows display name validation error when empty', async () => {
     renderCompleteProfile();
 
+    // Select a valid adult DOB (year 1990, January 1) so ageStatus becomes 'adult'
+    // and the submit button is enabled before clicking it
+    const monthSelect = screen.getByLabelText(/month/i);
+    await userEvent.selectOptions(monthSelect, '1');
+
+    const daySelect = screen.getByLabelText(/day/i);
+    await userEvent.selectOptions(daySelect, '1');
+
+    const yearSelect = screen.getByLabelText(/year/i);
+    await userEvent.selectOptions(yearSelect, '1990');
+
     const submitButton = screen.getByRole('button', { name: /complete profile/i });
     fireEvent.click(submitButton);
 
