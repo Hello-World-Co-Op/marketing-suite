@@ -41,6 +41,7 @@ const MARKETING_ALLOWED_PATHS = [
   '/verify',
   '/login',
   '/link-identity',
+  '/complete-profile',
   '/mission-control',
   '/dashboard',
   '/settings',

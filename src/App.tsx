@@ -16,6 +16,8 @@ import BlogLanding from '@/pages/blog/BlogLanding';
 import Register from '@/pages/Register';
 import VerifyEmail from '@/pages/VerifyEmail';
 import LinkIdentity from '@/pages/LinkIdentity';
+// BL-005.3: II-first profile completion page
+import CompleteProfile from '@/pages/CompleteProfile';
 // BL-012.4: COPPA parental consent pages
 import ParentalConsentPending from '@/pages/ParentalConsentPending';
 import ConsentLanding from '@/pages/ConsentLanding';
@@ -63,6 +65,8 @@ function App() {
             <Route path="/register" element={<Navigate to="/signup" replace />} />
             <Route path="/verify" element={<VerifyEmail />} />
             <Route path="/link-identity" element={<LinkIdentity />} />
+            {/* BL-005.3: II-first profile completion */}
+            <Route path="/complete-profile" element={<CompleteProfile />} />
             {/* BL-012.4: COPPA parental consent routes */}
             <Route path="/parental-consent-pending" element={<ParentalConsentPending />} />
             <Route path="/consent" element={<ConsentLanding />} />
