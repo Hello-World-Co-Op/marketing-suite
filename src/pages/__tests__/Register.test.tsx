@@ -18,6 +18,20 @@ vi.mock('@/hooks/useUserService', () => ({
   }),
 }));
 
+// BL-005.5: Mock useIILogin
+const mockIILoginWithII = vi.fn();
+
+vi.mock('@hello-world-co-op/auth', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@hello-world-co-op/auth')>();
+  return {
+    ...actual,
+    useIILogin: () => ({
+      loginWithII: mockIILoginWithII,
+      isLoading: false,
+    }),
+  };
+});
+
 // Mock crypto utilities
 vi.mock('@/utils/crypto', () => ({
   hashEmail: vi.fn().mockResolvedValue('mockedhash'),
@@ -290,5 +304,33 @@ describe('Register page', () => {
       expect(screen.getByLabelText('What interests you most?')).toBeInTheDocument();
       expect(screen.getByLabelText('How did you hear about us?')).toBeInTheDocument();
     });
+  });
+});
+
+describe('BL-005.5: Internet Identity on Register page', () => {
+  beforeEach(() => {
+    mockIILoginWithII.mockReset();
+  });
+
+  it('renders Continue with Internet Identity button', () => {
+    renderRegister();
+
+    const iiButton = screen.getByTestId('ii-register-button');
+    expect(iiButton).toBeInTheDocument();
+    expect(iiButton).toHaveTextContent(/continue with internet identity/i);
+  });
+
+  it('calls loginWithII when II button is clicked', async () => {
+    renderRegister();
+
+    fireEvent.click(screen.getByTestId('ii-register-button'));
+
+    expect(mockIILoginWithII).toHaveBeenCalledTimes(1);
+  });
+
+  it('renders "Or register with email" divider', () => {
+    renderRegister();
+
+    expect(screen.getByText('Or register with email')).toBeInTheDocument();
   });
 });

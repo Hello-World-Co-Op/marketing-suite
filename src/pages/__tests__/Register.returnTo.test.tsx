@@ -59,6 +59,18 @@ vi.mock('@/components/DateOfBirthInput/DateOfBirthInput', () => ({
   getDaysInMonth: () => 31,
 }));
 
+// BL-005.5: Mock useIILogin
+vi.mock('@hello-world-co-op/auth', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@hello-world-co-op/auth')>();
+  return {
+    ...actual,
+    useIILogin: () => ({
+      loginWithII: vi.fn(),
+      isLoading: false,
+    }),
+  };
+});
+
 // We need to import AFTER mocks
 import Register from '../Register';
 

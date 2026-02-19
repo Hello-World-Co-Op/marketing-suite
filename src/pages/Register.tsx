@@ -16,7 +16,7 @@ import { hashIpAddress } from '@/utils/password-validation';
 import { interestFormSchema } from '@/utils/validation';
 import { useUserService } from '@/hooks/useUserService';
 import { cn } from '@/utils/cn';
-import { validateReturnUrl } from '@hello-world-co-op/auth';
+import { validateReturnUrl, useIILogin } from '@hello-world-co-op/auth';
 import DateOfBirthInput, {
   getDaysInMonth,
   type DateOfBirthValue,
@@ -180,6 +180,38 @@ export default function Register() {
   const [dobValue, setDobValue] = useState<DateOfBirthValue | null>(null);
   // BL-012.4: Parental consent state for 13-17 users
   const [requiresParentalConsent, setRequiresParentalConsent] = useState(false);
+
+  // BL-005.5: Internet Identity login state and hook
+  const [iiError, setIiError] = useState<string | null>(null);
+  const oracleBaseUrl = import.meta.env.VITE_ORACLE_BRIDGE_URL || 'http://localhost:3000';
+  const founderyUrl = import.meta.env.VITE_FOUNDERY_OS_URL || 'https://staging-foundery.helloworlddao.com';
+  const { loginWithII, isLoading: isIILoading } = useIILogin({
+    oracleBaseUrl,
+    onSuccess: async () => {
+      // II login succeeded -- cookies are set.
+      // Check session to determine next step (profile complete or not)
+      try {
+        const res = await fetch(`${oracleBaseUrl}/api/auth/session`, { credentials: 'include' });
+        const session = await res.json();
+        if (session.profile_complete === false) {
+          // II-first user, needs to complete profile
+          const marketingUrl = import.meta.env.VITE_MARKETING_URL || 'https://www.helloworlddao.com';
+          const completeProfileUrl = `${marketingUrl}/complete-profile`;
+          const returnToStored = localStorage.getItem(RETURN_TO_KEY) || `${founderyUrl}/mission-control`;
+          window.location.href = `${completeProfileUrl}?returnUrl=${encodeURIComponent(returnToStored)}`;
+        } else {
+          // Existing complete account -- redirect to foundery or returnUrl
+          const destination = localStorage.getItem(RETURN_TO_KEY) || `${founderyUrl}/mission-control`;
+          localStorage.removeItem(RETURN_TO_KEY);
+          window.location.href = destination;
+        }
+      } catch {
+        // Fallback: navigate to foundery
+        window.location.href = `${founderyUrl}/mission-control`;
+      }
+    },
+    onError: setIiError,
+  });
 
   const {
     register,
@@ -671,6 +703,38 @@ Generated: ${new Date().toISOString()}
             {status.message}
           </div>
         )}
+
+        {/* BL-005.5: Internet Identity Alternative */}
+        <div className="mb-6">
+          <button
+            type="button"
+            onClick={loginWithII}
+            disabled={isIILoading || isSubmitting}
+            data-testid="ii-register-button"
+            className="w-full flex items-center justify-center gap-2 px-6 py-3 rounded-lg border-2 border-slate-300 bg-white text-slate-800 font-semibold hover:border-slate-400 hover:bg-slate-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {isIILoading ? (
+              'Connecting to Internet Identity...'
+            ) : (
+              'Continue with Internet Identity'
+            )}
+          </button>
+
+          {iiError && (
+            <div className="mt-2 p-3 bg-red-50 border border-red-200 rounded-lg text-red-800 text-sm" role="alert">
+              {iiError}
+            </div>
+          )}
+
+          <div className="relative my-6">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-slate-300" />
+            </div>
+            <div className="relative flex justify-center text-sm">
+              <span className="bg-white px-3 text-slate-500">Or register with email</span>
+            </div>
+          </div>
+        </div>
 
         {/* Registration form */}
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
