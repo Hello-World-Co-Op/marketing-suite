@@ -124,13 +124,18 @@ describe('ParentalConsentPending page (BL-012.4)', () => {
 
       renderPage();
 
-      // Perform 3 successful resends
+      // Perform 3 successful resends sequentially, waiting for each to settle
       for (let i = 0; i < 3; i++) {
         mockFetch.mockResolvedValueOnce({ ok: true, json: () => Promise.resolve({}) });
-        fireEvent.click(screen.getByTestId('resend-consent-button'));
+        const button = screen.getByTestId('resend-consent-button');
+        fireEvent.click(button);
+        // Wait for this specific fetch call to be registered AND for the button
+        // to be re-enabled (or disabled on the 3rd) before continuing
         await waitFor(() => {
           expect(mockFetch).toHaveBeenCalledTimes(i + 1);
         });
+        // Give React time to process the state update from the resolved fetch
+        await new Promise((r) => setTimeout(r, 50));
       }
 
       await waitFor(() => {
