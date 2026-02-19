@@ -173,7 +173,7 @@ export default function LinkIdentity() {
         {status === 'success' && (
           <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg text-center" role="status">
             <p className="text-green-800 font-medium">Internet Identity linked successfully!</p>
-            <p className="text-green-600 text-sm mt-1">Redirecting to your dashboard...</p>
+            <p className="text-green-600 text-sm mt-1">Redirecting you back...</p>
           </div>
         )}
 
