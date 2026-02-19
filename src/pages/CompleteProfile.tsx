@@ -1,12 +1,30 @@
 import { useState, useEffect, useCallback } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import { validateReturnUrl } from '@hello-world-co-op/auth';
 import DateOfBirthInput, {
   type DateOfBirthValue,
 } from '@/components/DateOfBirthInput/DateOfBirthInput';
 import { calculateAge } from '@/pages/Register';
 import { cn } from '@/utils/cn';
+
+// Allowed paths for returnUrl validation (open redirect prevention)
+const COMPLETE_PROFILE_ALLOWED_PATHS = [
+  '/signup',
+  '/verify',
+  '/link-identity',
+  '/complete-profile',
+  '/mission-control',
+  '/dashboard',
+  '/settings',
+  '/profile',
+  '/chat',
+  '/fleet',
+  '/workspace',
+  '/backlog',
+];
 
 // ============================================================================
 // Schema
@@ -64,9 +82,16 @@ export default function CompleteProfile() {
   const [submitError, setSubmitError] = useState('');
   const [ageStatus, setAgeStatus] = useState<AgeStatus>('pending');
   const [dobValue, setDobValue] = useState<DateOfBirthValue | null>(null);
+  const [searchParams] = useSearchParams();
 
   const oracleUrl = import.meta.env.VITE_ORACLE_BRIDGE_URL;
   const daoSuiteUrl = import.meta.env.VITE_DAO_SUITE_URL || 'https://portal.helloworlddao.com';
+
+  // Validate returnUrl once on mount (open redirect prevention)
+  const returnUrl = validateReturnUrl(searchParams.get('returnUrl'), {
+    allowedPaths: COMPLETE_PROFILE_ALLOWED_PATHS,
+    defaultRedirect: daoSuiteUrl,
+  });
 
   const {
     register,
@@ -138,7 +163,8 @@ export default function CompleteProfile() {
 
   // Form submission
   const onSubmit = async (data: CompleteProfileFormData) => {
-    if (ageStatus === 'blocked') return;
+    // Block submission when DOB is not yet entered (pending) or user is under 13 (blocked)
+    if (ageStatus === 'blocked' || ageStatus === 'pending') return;
 
     setSubmitStatus('submitting');
     setSubmitError('');
@@ -178,19 +204,17 @@ export default function CompleteProfile() {
 
       setSubmitStatus('success');
 
-      // Redirect based on response
+      // Redirect based on response. For adults, prefer returnUrl (from query param, already validated)
+      // over the oracle-bridge's redirect (which defaults to production portal).
       if (result.consent_pending) {
         // Minor — redirect to parental consent pending page
         setTimeout(() => {
           window.location.href = `${window.location.origin}/parental-consent-pending`;
         }, 1500);
-      } else if (result.redirect) {
-        setTimeout(() => {
-          window.location.href = result.redirect;
-        }, 1500);
       } else {
+        // Adult — use validated returnUrl (defaults to daoSuiteUrl if no valid returnUrl provided)
         setTimeout(() => {
-          window.location.href = daoSuiteUrl;
+          window.location.href = returnUrl;
         }, 1500);
       }
     } catch (err) {
@@ -369,7 +393,7 @@ export default function CompleteProfile() {
           {/* Submit Button */}
           <button
             type="submit"
-            disabled={submitStatus === 'submitting' || submitStatus === 'success' || ageStatus === 'blocked'}
+            disabled={submitStatus === 'submitting' || submitStatus === 'success' || ageStatus === 'blocked' || ageStatus === 'pending'}
             className="w-full py-3 px-4 bg-primary-700 text-white rounded-lg font-semibold hover:bg-primary-800 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             aria-label="Complete profile"
           >
