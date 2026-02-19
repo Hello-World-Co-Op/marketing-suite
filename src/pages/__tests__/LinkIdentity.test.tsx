@@ -19,6 +19,10 @@ vi.mock('@dfinity/auth-client', () => ({
   AuthClient: { create: mockCreate },
 }));
 
+vi.mock('@dfinity/identity', () => ({
+  DelegationIdentity: class MockDelegationIdentity {},
+}));
+
 vi.mock('@hello-world-co-op/auth', () => ({
   validateReturnUrl: mockValidateReturnUrl,
 }));
@@ -122,9 +126,14 @@ describe('LinkIdentity', () => {
   });
 
   it('shows success message after successful linking', async () => {
-    mockGetIdentity.mockReturnValue({
-      getPrincipal: () => ({ toText: () => 'abc-123-def' }),
+    // Create a mock that passes instanceof DelegationIdentity check
+    const { DelegationIdentity } = await import('@dfinity/identity');
+    const mockIdentity = Object.create(DelegationIdentity.prototype);
+    mockIdentity.getPrincipal = () => ({ toText: () => 'abc-123-def' });
+    mockIdentity.getDelegation = () => ({
+      toJSON: () => ({ publicKey: '302a', delegations: [] }),
     });
+    mockGetIdentity.mockReturnValue(mockIdentity);
 
     mockLogin.mockImplementation(async ({ onSuccess }: { onSuccess: () => Promise<void> }) => {
       await onSuccess();
@@ -149,9 +158,13 @@ describe('LinkIdentity', () => {
   });
 
   it('shows error message on API failure', async () => {
-    mockGetIdentity.mockReturnValue({
-      getPrincipal: () => ({ toText: () => 'abc-123-def' }),
+    const { DelegationIdentity } = await import('@dfinity/identity');
+    const mockIdentity = Object.create(DelegationIdentity.prototype);
+    mockIdentity.getPrincipal = () => ({ toText: () => 'abc-123-def' });
+    mockIdentity.getDelegation = () => ({
+      toJSON: () => ({ publicKey: '302a', delegations: [] }),
     });
+    mockGetIdentity.mockReturnValue(mockIdentity);
 
     mockLogin.mockImplementation(async ({ onSuccess }: { onSuccess: () => Promise<void> }) => {
       await onSuccess();
@@ -196,7 +209,7 @@ describe('LinkIdentity', () => {
 
     const helpLink = screen.getByRole('link', { name: /having trouble/i });
     expect(helpLink).toBeInTheDocument();
-    expect(helpLink).toHaveAttribute('href', 'https://internetcomputer.org/docs/building-apps/authentication/internet-identity');
+    expect(helpLink).toHaveAttribute('href', 'https://internetcomputer.org/internet-identity');
     expect(helpLink).toHaveAttribute('target', '_blank');
 
     // Old "link later from settings" note should NOT exist
@@ -231,9 +244,13 @@ describe('LinkIdentity', () => {
   it('uses returnUrl from query params for redirect after successful linking', async () => {
     vi.useFakeTimers({ shouldAdvanceTime: true });
 
-    mockGetIdentity.mockReturnValue({
-      getPrincipal: () => ({ toText: () => 'abc-123-def' }),
+    const { DelegationIdentity } = await import('@dfinity/identity');
+    const mockIdentity = Object.create(DelegationIdentity.prototype);
+    mockIdentity.getPrincipal = () => ({ toText: () => 'abc-123-def' });
+    mockIdentity.getDelegation = () => ({
+      toJSON: () => ({ publicKey: '302a', delegations: [] }),
     });
+    mockGetIdentity.mockReturnValue(mockIdentity);
 
     mockLogin.mockImplementation(async ({ onSuccess }: { onSuccess: () => Promise<void> }) => {
       await onSuccess();

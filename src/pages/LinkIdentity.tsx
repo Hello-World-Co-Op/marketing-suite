@@ -73,9 +73,15 @@ export default function LinkIdentity() {
           try {
             const identity = authClient.getIdentity();
             const principal = identity.getPrincipal().toText();
-            const timestamp = Date.now();
-            const challenge = `ch-${timestamp}`;
-            const delegationData = `${challenge}:${principal}:delegationData`;
+
+            // Extract real DelegationChain from the authenticated identity
+            // Dynamic import avoids bundling @dfinity/identity when not needed
+            const { DelegationIdentity } = await import('@dfinity/identity');
+            if (!(identity instanceof DelegationIdentity)) {
+              throw new Error('Identity does not have a delegation chain');
+            }
+            const delegation = identity.getDelegation();
+            const serializedChain = JSON.stringify(delegation.toJSON());
 
             const csrfToken = getCookie('csrf_token');
             const headers: Record<string, string> = { 'Content-Type': 'application/json' };
@@ -85,7 +91,7 @@ export default function LinkIdentity() {
               method: 'POST',
               headers,
               credentials: 'include',
-              body: JSON.stringify({ delegation: delegationData }),
+              body: JSON.stringify({ delegation: serializedChain, ii_principal: principal }),
             });
 
             const result = await response.json();
@@ -208,7 +214,7 @@ export default function LinkIdentity() {
         {/* Help links */}
         <div className="mt-6 text-center space-y-2">
           <a
-            href="https://internetcomputer.org/docs/building-apps/authentication/internet-identity"
+            href="https://internetcomputer.org/internet-identity"
             target="_blank"
             rel="noopener noreferrer"
             className="text-sm text-slate-500 hover:text-slate-700 underline"
